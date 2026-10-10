@@ -175,7 +175,7 @@ tr.tot td { font-weight: 700; border-top: 2px solid var(--accent); background: v
 td.bl { color: #1a1ac8; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rp-info b { background: #3a3419; color: #9db4ff; } :root:not([data-theme="light"]) .rp-g .it, :root:not([data-theme="light"]) .bl, :root:not([data-theme="light"]) td.bl { color: #9db4ff; } }
 :root[data-theme="dark"] .rp-info b { background: #3a3419; color: #9db4ff; }
-.exp { display: flex; justify-content: flex-end; }
+.exp { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .exp .btn { background: #1e5c4a; }
 .ovl { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 12px; }
 .ovb { background: var(--surface); border-radius: 8px; padding: 12px; max-width: 100%; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -672,7 +672,7 @@ function inp(key, val, o) {
 function viewDaily() {
   var dd = S.dd, R = buildRep(dd); LASTREP = R;
   var h = dateCard(dd, todayStr());
-  h += '<div class="exp"><button class="btn" data-act="export">📊 Xuất file Excel</button></div>';
+  h += '<div class="exp"><button class="btn" data-act="exportimg">🖼️ Xuất hình ảnh</button><button class="btn" data-act="export">📊 Xuất file Excel</button></div>';
   h += '<div class="rp"><div class="rp-title">VFC – MỤC TIÊU VÀ KẾT QUẢ NGÀY TERRITORY</div>' +
     '<div class="rp-note">Ô <b class="bl">nền vàng</b> là ô anh nhập hoặc sửa được; các ô còn lại tự tính từ tab Thực hiện và kế hoạch tháng. Ô có số tự động mà anh gõ đè thì xóa trống để quay về số tự động. Nguyên nhân, giải pháp tự chép từ ngày gần nhất.</div>' +
     '<div class="rp-info"><span>Ngày</span><b class="bl">' + dmyy(dd) + " (" + dayLabel(dd) + ')</b><span>Territory</span><b>' + inp("terr", R.terr, { cfg: 1, text: 1, lab: "Territory" }) + '</b><span>TSM</span><b>' + inp("tsm", R.tsm, { cfg: 1, text: 1, lab: "TSM" }) + "</b></div>";
@@ -800,7 +800,7 @@ function zipStore(files) {
 function xe(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ""); }
 function colL(c) { var s = ""; c++; while (c > 0) { var m = (c - 1) % 26; s = String.fromCharCode(65 + m) + s; c = Math.floor((c - 1) / 26); } return s; }
 var XL_STYLES = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac x16r2\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:x16r2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/02/main\"><numFmts count=\"3\"><numFmt numFmtId=\"164\" formatCode=\"#,##0.0;\\(#,##0.0\\);\\-\"/><numFmt numFmtId=\"165\" formatCode=\"#,##0;\\(#,##0\\);\\-\"/><numFmt numFmtId=\"166\" formatCode=\"0.0%;\\(0.0%\\);\\-\"/></numFmts><fonts count=\"9\"><font><sz val=\"11\"/><name val=\"Arial\"/></font><font><b/><sz val=\"11\"/><color rgb=\"FFFFFFFF\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF333333\"/><name val=\"Arial\"/></font><font><b/><sz val=\"11\"/><color rgb=\"FF0E4A41\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF0000FF\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF0000FF\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF000000\"/><name val=\"Arial\"/></font><font><b/><sz val=\"16\"/><color rgb=\"FF0E4A41\"/><name val=\"Arial\"/></font><font><b/><sz val=\"11\"/><color rgb=\"FF0E4A41\"/><name val=\"Arial\"/></font></fonts><fills count=\"7\"><fill><patternFill patternType=\"none\"/></fill><fill><patternFill patternType=\"gray125\"/></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFFFFFF\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFFF2CC\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FF19695B\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFD9EAE6\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFF0F3F2\"/><bgColor indexed=\"64\"/></patternFill></fill></fills><borders count=\"8\"><border><left/><right/><top/><bottom/><diagonal/></border><border><left/><right/><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right/><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left/><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom/><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top/><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top/><bottom/><diagonal/></border></borders><cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/></cellStyleXfs><cellXfs count=\"39\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"2\" borderId=\"0\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\"/><xf numFmtId=\"164\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"164\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"166\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"164\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"5\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"166\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"3\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"1\" fillId=\"4\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"3\" fillId=\"5\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" indent=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"3\" fillId=\"5\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"5\" fillId=\"3\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"7\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyFont=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"14\" fontId=\"4\" fillId=\"3\" borderId=\"2\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"4\" fillId=\"3\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"4\" fillId=\"3\" borderId=\"4\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"8\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"8\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"8\" fillId=\"0\" borderId=\"7\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"4\" fillId=\"3\" borderId=\"2\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf></cellXfs><cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\"/></cellStyles><dxfs count=\"3\"><dxf><font><color rgb=\"FF9C0006\"/></font><fill><patternFill patternType=\"solid\"><fgColor indexed=\"64\"/><bgColor rgb=\"FFFFC7CE\"/></patternFill></fill></dxf><dxf><font><color rgb=\"FF9C5700\"/></font><fill><patternFill patternType=\"solid\"><fgColor indexed=\"64\"/><bgColor rgb=\"FFFFEB9C\"/></patternFill></fill></dxf><dxf><font><color rgb=\"FF006100\"/></font><fill><patternFill patternType=\"solid\"><fgColor indexed=\"64\"/><bgColor rgb=\"FFC6EFCE\"/></patternFill></fill></dxf></dxfs><tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/><extLst><ext uri=\"{EB79DEF2-80B8-43e5-95BD-54CBDDF9020C}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:slicerStyles defaultSlicerStyle=\"SlicerStyleLight1\"/></ext><ext uri=\"{9260A510-F301-46a8-8635-F512D64BE5F5}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:timelineStyles defaultTimelineStyle=\"TimeSlicerStyleLight1\"/></ext></extLst></styleSheet>";
-function buildXlsx(R) {
+function buildXlsx(R, modelOnly) {
   var rows = {}, merges = [], heights = { 1: 8, 2: 30, 3: 8, 4: 21, 5: 8, 6: 8, 7: 8, 8: 36, 11: 36, 21: 8 };
   function put(r, c, v, s, f) { (rows[r] = rows[r] || {})[c] = { v: v, s: s, f: f }; }
   function mg(a) { merges.push(a); }
@@ -856,6 +856,7 @@ function buildXlsx(R) {
   });
   var widths = [13.33, 38.33, 9.16, 17.5, 17.5, 17.5, 21.66, 21.66, 17.5, 17.5];
   Object.keys(heights).forEach(function (h) { rows[h] = rows[h] || {}; });
+  if (modelOnly) return { rows: rows, merges: merges, heights: heights, widths: widths };
   var sd = Object.keys(rows).map(Number).sort(function (a, b) { return a - b; }).map(function (rr) {
     var cs = Object.keys(rows[rr]).map(Number).sort(function (a, b) { return a - b; }).map(function (c) {
       var x = rows[rr][c], ref = colL(c) + rr, a = ' r="' + ref + '" s="' + x.s + '"';
@@ -905,21 +906,97 @@ function showImg(src) {
   o.querySelector("button").onclick = function () { o.remove(); };
   document.body.appendChild(o);
 }
+/* Ảnh báo cáo: vẽ lại đúng bảng của file Excel (cùng ô, ô gộp, màu, định dạng số) */
+var XS = { 2: { n: 164, f: "calc", a: "r" }, 3: { n: 164, f: "in", a: "r" }, 4: { n: 165, f: "calc", a: "r" }, 5: { n: 165, f: "in", a: "r" }, 6: { n: 166, f: "calc", a: "c" },
+  7: { n: 164, f: "in" }, 8: { n: 165, f: "in", a: "c" }, 9: { n: 165, f: "in", a: "r" }, 10: { n: 166, f: "in", a: "c" }, 11: { nb: 1 }, 12: { b: 1, c: "#0E4A41", a: "r", nb: 1 },
+  13: { f: "in", a: "c" }, 14: { f: "head", a: "c", w: 1 }, 15: {}, 16: {}, 17: {}, 18: { a: "c" }, 19: { a: "c" }, 20: { f: "grp", b: 1 }, 21: { ind: 1 }, 22: { f: "grp", b: 1, a: "c" },
+  23: { f: "in", w: 1 }, 24: { n: 165, f: "in", a: "c" }, 25: { f: "in", w: 1 }, 26: { w: 1 }, 27: { w: 1 }, 28: { b: 1, sz: 21, c: "#0E4A41", a: "c", nb: 1 }, 29: { n: 14, f: "in", a: "c" },
+  30: { f: "in", a: "c" }, 31: { f: "in", a: "c" }, 32: { b: 1, c: "#0E4A41", a: "c", w: 1 }, 33: { b: 1, c: "#0E4A41", a: "c", w: 1 }, 34: { b: 1, c: "#0E4A41", a: "c", w: 1 }, 35: { f: "in", a: "c" },
+  36: { n: 165, f: "in" }, 37: { n: 165, f: "in", a: "r" }, 38: { n: 165, f: "calc", a: "r" } };
+var XFILL = { "in": ["#FFF2CC", "#0000FF"], calc: ["#F0F3F2", "#000000"], head: ["#19695B", "#FFFFFF"], grp: ["#D9EAE6", "#0E4A41"] };
+function xlFmt(v, n) {
+  if (v == null || v === "") return "";
+  if (typeof v !== "number") return String(v);
+  if (n === 14) { var d = new Date(Date.UTC(1899, 11, 30) + v * 864e5); return pad(d.getUTCDate()) + "/" + pad(d.getUTCMonth() + 1) + "/" + d.getUTCFullYear(); }
+  if (!n) return nf.format(v);
+  if (v === 0) return "-";
+  var pct = n === 166, x = Math.abs(pct ? v * 100 : v);
+  var t = new Intl.NumberFormat("vi-VN", { minimumFractionDigits: n === 165 ? 0 : 1, maximumFractionDigits: n === 165 ? 0 : 1 }).format(x) + (pct ? "%" : "");
+  return v < 0 ? "(" + t + ")" : t;
+}
+function drawXl(R) {
+  var M = buildXlsx(R, true), SC = 2, PAD = 14, F = "Arial, Helvetica, sans-serif";
+  var cw = M.widths.map(function (w) { return Math.round(w * 7 + 5); }), cx = [PAD];
+  cw.forEach(function (w, i) { cx[i + 1] = cx[i] + w; });
+  var rnums = Object.keys(M.rows).map(Number).sort(function (a, b) { return a - b; }), last = rnums[rnums.length - 1];
+  var ry = {}, y = PAD;
+  for (var r = 2; r <= last; r++) { ry[r] = y; y += Math.round((M.heights[r] || 15) * 4 / 3); }
+  var H = y + PAD, W = cx[cw.length] + PAD;
+  function rh(r) { return Math.round((M.heights[r] || 15) * 4 / 3); }
+  var mg = {}, cover = {};
+  M.merges.forEach(function (ref) {
+    var m = /^([A-Z])(\d+):([A-Z])(\d+)$/.exec(ref); if (!m) return;
+    var c1 = m[1].charCodeAt(0) - 65, r1 = +m[2], c2 = m[3].charCodeAt(0) - 65, r2 = +m[4];
+    mg[r1 + ":" + c1] = { c2: c2, r2: r2 };
+    for (var rr = r1; rr <= r2; rr++) for (var cc = c1; cc <= c2; cc++) if (rr !== r1 || cc !== c1) cover[rr + ":" + cc] = 1;
+  });
+  var cv = document.createElement("canvas"); cv.width = W * SC; cv.height = H * SC;
+  var c = cv.getContext("2d"); c.scale(SC, SC); c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, W, H); c.textBaseline = "middle";
+  function wrapLines(t, w, font) {
+    c.font = font; var out = [];
+    String(t).split("\n").forEach(function (para) {
+      var line = ""; para.split(" ").forEach(function (wd) { var tt = line ? line + " " + wd : wd; if (c.measureText(tt).width > w && line) { out.push(line); line = wd; } else line = tt; });
+      out.push(line);
+    });
+    return out;
+  }
+  var texts = [];
+  rnums.forEach(function (r) {
+    if (r < 2) return;
+    Object.keys(M.rows[r]).map(Number).forEach(function (col) {
+      var key = r + ":" + col; if (cover[key]) return;
+      var cell = M.rows[r][col], st = XS[cell.s] || {}, m = mg[key];
+      var x0 = cx[col], x1 = cx[(m ? m.c2 : col) + 1], y0 = ry[r], y1 = m ? ry[m.r2] + rh(m.r2) : y0 + rh(r);
+      var fill = st.f ? XFILL[st.f][0] : null, color = st.f ? XFILL[st.f][1] : (st.c || "#333333");
+      var v = cell.v, isPct = st.n === 166 && col === 5 && r >= 12 && r <= 20 && typeof v === "number";
+      if (isPct) { if (v >= 1) { fill = "#C6EFCE"; color = "#006100"; } else if (v >= 0.8) { fill = "#FFEB9C"; color = "#9C5700"; } else { fill = "#FFC7CE"; color = "#9C0006"; } }
+      if (fill) { c.fillStyle = fill; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
+      if (!st.nb) { c.strokeStyle = "#BFBFBF"; c.lineWidth = 1; c.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0, y1 - y0); }
+      var txt = xlFmt(v, st.n); if (!txt) return;
+      var al = st.a || (typeof v === "number" ? "r" : "l");
+      texts.push({ t: txt, x0: x0, x1: x1, y0: y0, y1: y1, al: al, color: color, font: (st.b ? "bold " : "") + (st.sz || 14) + "px " + F, wrap: st.w, ind: st.ind, r: r, col: col });
+    });
+  });
+  texts.forEach(function (o) {
+    var x1 = o.x1;
+    if (!o.wrap && o.al === "l") { for (var k = o.col + 1; k < cw.length; k++) { var nx = M.rows[o.r][k]; if (nx && nx.v != null && nx.v !== "") break; if (cover[o.r + ":" + k]) break; x1 = cx[k + 1]; } }
+    var w = x1 - o.x0 - 10 - (o.ind ? 10 : 0);
+    var lines = o.wrap ? wrapLines(o.t, w, o.font) : [o.t];
+    c.save(); c.beginPath(); c.rect(o.x0 + 1, o.y0 + 1, x1 - o.x0 - 2, o.y1 - o.y0 - 2); c.clip();
+    c.font = o.font; c.fillStyle = o.color; c.textAlign = o.al === "r" ? "right" : o.al === "c" ? "center" : "left";
+    var lh = 17, ty = (o.y0 + o.y1) / 2 - (lines.length - 1) * lh / 2 + 1;
+    lines.forEach(function (ln, i) { c.fillText(ln, o.al === "r" ? o.x1 - 5 : o.al === "c" ? (o.x0 + o.x1) / 2 : o.x0 + 5 + (o.ind ? 10 : 0), ty + i * lh); });
+    c.restore();
+  });
+  return cv;
+}
+function imgName(dd) { return "Khánh_Báo cáo ngày_" + dd.slice(8, 10) + "." + dd.slice(5, 7) + "." + dd.slice(0, 4) + ".png"; }
 async function exportImg() {
-  if (!LASTREP) return;
-  var cv = drawReport(LASTREP);
+  var fe = document.activeElement; if (fe && fe.hasAttribute && fe.hasAttribute("data-rp")) { clearTimeout(fe._rt); if (fe._saved !== fe.value) { fe._saved = fe.value; rpSet(fe.getAttribute("data-sc"), fe.getAttribute("data-rp"), fe.value); } }
+  LASTREP = buildRep(S.dd);
+  var cv; try { cv = drawXl(LASTREP); } catch (e) { toast("Chưa tạo được ảnh"); return; }
   var blob = await new Promise(function (r) { cv.toBlob(r, "image/png"); });
   if (!blob) { toast("Chưa tạo được ảnh"); return; }
+  var fn = imgName(LASTREP.dd);
   var dl = null; try { dl = window.claude ? await window.claude.use("downloads") : null; } catch (e) { dl = null; }
   if (dl) {
-    try { await dl.save({ filename: "muc-tieu-ket-qua-ngay-" + LASTREP.dd.replace(/-/g, "") + ".png", data: blob }); toast("Đã xuất ảnh"); return; }
+    try { await dl.save({ filename: fn, data: blob }); toast("Đã xuất ảnh"); return; }
     catch (e) { if (e && e.code === "declined") return; }
   }
   if (!window.claude) {
-    var fn = "muc-tieu-ket-qua-ngay-" + LASTREP.dd.replace(/-/g, "") + ".png";
     try {
       var f = new File([blob], fn, { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: "Mục tiêu và kết quả ngày" }); return; }
+      if (navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày" }); return; }
     } catch (e) { if (e && e.name === "AbortError") return; }
     try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải ảnh về máy"); return; } catch (e) {}
   }
@@ -1029,6 +1106,7 @@ view.addEventListener("click", function (ev) {
   else if (act === "kmode") { S.kmode = t.getAttribute("data-v"); render(); }
   else if (act === "unit") { S.unit = t.getAttribute("data-v"); render(); }
   else if (act === "export") { exportXlsx(); }
+  else if (act === "exportimg") { exportImg(); }
   else if (act === "bcview") { S.bcview = t.getAttribute("data-v"); render(); }
   else if (act === "khview") { S.khview = t.getAttribute("data-v"); render(); }
   else if (act === "open") { var kk = t.getAttribute("data-k"); S.open[kk] = !S.open[kk]; render(); }

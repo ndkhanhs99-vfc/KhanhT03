@@ -1,0 +1,30 @@
+<div id="gate" style="position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px">
+  <form id="gf" style="background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px 20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:var(--font-display);font-weight:800;font-size:1.35rem">Báo cáo ngày</div>
+    <div style="color:var(--muted);font-size:14px">Nguyễn Duy Khánh · SE Tân Châu</div>
+    <label for="gp" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--muted)">Mật khẩu</label>
+    <input id="gp" type="password" inputmode="numeric" autocomplete="current-password" style="font:inherit;font-size:18px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg)">
+    <div id="ge" role="alert" style="color:var(--bad);font-size:13px;min-height:1.2em"></div>
+    <button class="btn" type="submit">Mở</button>
+  </form>
+</div>
+<script>
+(function () {
+  var H = "dc41535a453d978394cac097a8236044ff4fdd40fa8f02ef95177c4f562cc19a", K = "sdsse_auth";
+  function ok() { try { return localStorage.getItem(K) === H; } catch (e) { return false; } }
+  function open() { var g = document.getElementById("gate"); if (g) g.remove(); window.__startApp(); }
+  async function hash(t) {
+    var d = new TextEncoder().encode("VFC-T03|" + t);
+    var b = await crypto.subtle.digest("SHA-256", d);
+    return Array.prototype.map.call(new Uint8Array(b), function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+  }
+  if (ok()) { open(); return; }
+  setTimeout(function () { var p = document.getElementById("gp"); if (p) p.focus(); }, 50);
+  document.getElementById("gf").addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+    var v = document.getElementById("gp").value.trim();
+    if ((await hash(v)) === H) { try { localStorage.setItem(K, H); } catch (e) {} open(); }
+    else { document.getElementById("ge").textContent = "Sai mật khẩu, anh thử lại."; document.getElementById("gp").select(); }
+  });
+})();
+</script>

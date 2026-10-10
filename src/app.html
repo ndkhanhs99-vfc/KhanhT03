@@ -1,0 +1,1219 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sổ doanh số SE</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: thanh tab dính phía trên; tab Kế hoạch và Thực hiện cùng một khung nhập (thẻ ngày hiển thị, dải tuyến trong ngày, hàng ô nhập, bảng dòng đã nhập có sửa và xóa); Báo cáo và Lịch là bảng số liệu cuộn ngang trong khung riêng */
+:root {
+  --bg: #e4efe9;
+  --surface: #ffffff;
+  --fg: #14241b;
+  --muted: #55655a;
+  --line: #cfdcd3;
+  --accent: #1e5c4a;
+  --accent-fg: #ffffff;
+  --tint: #e0eee8;
+  --good: #1f6b2c;
+  --bad: #b3410d;
+  --warm-bg: #fff6e0;
+  --warm-line: #f5a623;
+  --warm-fg: #7a4d00;
+  --on-warm: #ffffff;
+  --font-display: "Bricolage Grotesque", "Be Vietnam Pro", system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1712; --surface: #16231b; --fg: #e6efe8; --muted: #9bb0a2; --line: #2a3b30;
+    --accent: #6fcfae; --accent-fg: #0e1712; --tint: #1d3329; --good: #84d38f; --bad: #f4a074;
+    --warm-bg: #2a2310; --warm-line: #d99a2b; --warm-fg: #f2c874; --on-warm: #1b1608;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1712; --surface: #16231b; --fg: #e6efe8; --muted: #9bb0a2; --line: #2a3b30;
+  --accent: #6fcfae; --accent-fg: #0e1712; --tint: #1d3329; --good: #84d38f; --bad: #f4a074;
+  --warm-bg: #2a2310; --warm-line: #d99a2b; --warm-fg: #f2c874; --on-warm: #1b1608;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14.5px; line-height: 1.45; padding-inline: 16px; padding-block: 0 56px; font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1100px; margin-inline: auto; }
+header { padding-block: 20px 12px; }
+header h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.45rem, 4.5vw, 2.1rem); margin: 0 0 4px; line-height: 1.1; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); margin-inline: -16px; padding-inline: 16px; }
+.tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; max-width: 1100px; margin-inline: auto; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { appearance: none; border: 0; background: none; color: var(--muted); font: inherit; font-weight: 600; padding: 12px 14px; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+main { padding-top: 18px; display: flex; flex-direction: column; gap: 16px; }
+.banner { border: 1px solid var(--bad); color: var(--bad); background: var(--surface); padding: 10px 12px; border-radius: 6px; font-size: 13.5px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-width: 0; }
+.tile .k { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0 0 4px; }
+.tile .v { font-family: var(--font-display); font-weight: 800; font-size: 1.55rem; line-height: 1.1; margin: 0; }
+.tile .s { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { appearance: none; border: 0; background: none; color: var(--fg); font: inherit; font-weight: 500; padding: 7px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+input[type=text], input[type=date], input[type=number], select { font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; min-width: 0; max-width: 100%; }
+.grow { flex: 1 1 200px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; min-width: 0; }
+.panel.flush { padding: 0; overflow: hidden; }
+.panel h2, h2.sec { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin: 0 0 10px; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.panel.flush .scroll { border: 0; border-radius: 0; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; white-space: nowrap; background: var(--surface); }
+td.num, th.num { text-align: right; white-space: nowrap; }
+td:first-child, th:first-child { position: sticky; left: 0; background: var(--surface); min-width: 12rem; max-width: 16rem; }
+table.ent { min-width: 680px; }
+table.ent td:first-child, table.ent th:first-child { position: static; min-width: 0; max-width: none; }
+table.ent tbody tr:nth-child(even) td { background: var(--bg); }
+tr.sub td { background: var(--tint); font-size: 13px; }
+tr.sub td:first-child { background: var(--tint); padding-left: 24px; }
+tr.tot td { font-weight: 700; border-top: 2px solid var(--accent); background: var(--tint); }
+.z { color: var(--muted); }
+.who { font-weight: 600; overflow-wrap: anywhere; }
+.meta { color: var(--muted); font-size: 12.5px; }
+.twist { appearance: none; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: 0; width: 100%; display: block; }
+.twist::before { content: "▸"; display: inline-block; width: 1.1em; color: var(--muted); }
+.twist[aria-expanded="true"]::before { content: "▾"; }
+.meter { display: inline-block; width: 90px; height: 8px; border-radius: 4px; background: var(--line); vertical-align: middle; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.good { color: var(--good); font-weight: 600; }
+.bad { color: var(--bad); font-weight: 600; }
+.btn { appearance: none; font: inherit; font-weight: 700; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); padding: 9px 16px; border-radius: 6px; cursor: pointer; }
+.btn.ghost { background: none; color: var(--accent); }
+.btn.sm { padding: 4px 10px; font-size: 13px; }
+.dcard { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
+.dcard .lab { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; color: var(--accent); margin: 0; }
+.dcard .big { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; margin: 0; }
+.btn.warm { background: var(--warm-line); border-color: var(--warm-line); color: var(--on-warm); }
+.dpick { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; padding-top: 10px; border-top: 1px solid var(--line); }
+.ph { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-weight: 700; }
+.badge { background: var(--warm-line); color: var(--on-warm); font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.04em; }
+.route { background: var(--warm-bg); border: 1px solid var(--warm-line); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; color: var(--warm-fg); }
+.route .rh { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+.pill { background: var(--accent); color: var(--accent-fg); font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rc { appearance: none; font: inherit; font-size: 13px; font-weight: 600; background: var(--surface); color: var(--fg); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.rc.on { background: var(--accent); color: var(--accent-fg); }
+.fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; align-items: end; }
+.fgrid .fw { grid-column: span 2; }
+@media (max-width: 640px) { .fgrid .fw { grid-column: span 1; } }
+.fld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fld > label, .fld > .fl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+.fld input, .fld select { width: 100%; }
+.fld input[readonly] { background: var(--tint); font-weight: 600; }
+.hint { margin: 10px 0 0; color: var(--muted); font-size: 13px; min-height: 1.2em; }
+.cb { position: relative; }
+.lb { position: absolute; z-index: 10; left: 0; right: 0; top: 100%; margin-top: 2px; max-height: 280px; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 8px 20px color-mix(in srgb, var(--fg) 20%, transparent); min-width: 14rem; }
+.op { display: flex; flex-direction: column; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: none; font: inherit; color: var(--fg); padding: 7px 10px; cursor: pointer; }
+.op b { font-weight: 600; overflow-wrap: anywhere; }
+.op span { color: var(--muted); font-size: 12.5px; }
+.op:hover, .op:focus-visible { background: var(--tint); }
+.op.none { cursor: default; color: var(--muted); }
+.lg { position: sticky; top: 0; padding: 5px 10px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; color: var(--muted); background: var(--bg); }
+.band { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 10px 14px; background: var(--accent); color: var(--accent-fg); font-weight: 700; }
+.band span { font-weight: 600; font-size: 13px; }
+.acts { display: flex; gap: 6px; justify-content: flex-end; }
+.ib { appearance: none; background: var(--surface); border: 1px solid var(--accent); color: var(--accent); width: 30px; height: 30px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; font: inherit; font-size: 12px; font-weight: 700; }
+.ib.x { border-color: var(--line); color: var(--muted); }
+.ib.wide { width: auto; padding-inline: 10px; }
+.ib.confirm { border-color: var(--bad); color: var(--bad); width: auto; padding-inline: 8px; }
+.ib svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tm { display: block; color: var(--muted); font-size: 12px; }
+.empty { color: var(--muted); padding: 14px; margin: 0; }
+.days { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 10px; }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px; min-width: 0; }
+.day.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.day h3 { margin: 0 0 6px; font-family: var(--font-display); font-size: 1rem; display: flex; justify-content: space-between; gap: 6px; }
+.day h3 span { color: var(--muted); font-family: var(--font-body); font-weight: 500; font-size: 12.5px; }
+.chip { appearance: none; display: block; width: 100%; text-align: left; font: inherit; font-size: 13px; color: var(--fg); background: var(--tint); border: 0; border-radius: 4px; padding: 5px 8px; margin-top: 5px; cursor: pointer; overflow-wrap: anywhere; }
+.chip small { display: block; color: var(--muted); font-size: 11.5px; }
+.visits { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; margin-top: 8px; }
+.visit { border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 3px; min-width: 0; background: var(--bg); }
+.vh { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.visit .btn { align-self: flex-start; margin-top: 6px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.ch { text-align: center; font-size: 11.5px; font-weight: 600; color: var(--muted); padding-block: 2px; }
+.cd { appearance: none; font: inherit; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 6px 2px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 0; }
+.cd b { font-size: 14px; }
+.cd span { font-size: 11px; color: var(--muted); }
+.cd.off { background: var(--bg); }
+.cd.miss span { color: var(--bad); font-weight: 600; }
+.cd.today { border-color: var(--accent); }
+.cd.sel { background: var(--tint); box-shadow: inset 0 0 0 2px var(--accent); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 6px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px); }
+@media (max-width: 480px) { td:first-child, th:first-child { min-width: 9.5rem; } .meter { width: 56px; } }
+
+.rp { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.rp-title { background: #1f4e79; color: #fff; font-weight: 800; padding: 10px 14px; letter-spacing: 0.02em; }
+.rp-note { font-size: 11.5px; font-style: italic; color: #b3410d; padding: 6px 14px; border-bottom: 1px solid var(--line); }
+.rp-info { display: grid; grid-template-columns: auto 1fr; gap: 0; border-bottom: 1px solid var(--line); }
+.rp-info span, .rp-info b { padding: 6px 14px; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.rp-info span { background: var(--tint); font-weight: 600; }
+.rp-info b { background: #fff6dd; color: #1a1ac8; font-weight: 500; }
+.rp-s { border: 0; border-radius: 0; }
+.rp-t { min-width: 0; }
+.rp-t th { background: #1f4e79; color: #fff; text-transform: none; letter-spacing: 0; font-size: 12.5px; }
+.rp-t td:first-child, .rp-t th:first-child { position: static; min-width: 0; max-width: none; }
+.rp-t td { padding: 6px 12px; font-size: 13.5px; }
+.rp-t td.c, .rp-t th.c { text-align: center; }
+.rp-t .lb2 { font-weight: 600; }
+.rp-t tr.gap td { padding: 3px; background: var(--tint); }
+.ovr { width: 5.5rem; text-align: right; background: #fff6dd; color: #1a1ac8; border-color: #e0c866; font-weight: 600; }
+.rp-g { margin-top: 10px; min-width: 640px; }
+.rp-g th { background: #548235; }
+.rp-g tbody tr:nth-child(even) td { background: var(--tint); }
+.rp-g .it { font-style: italic; color: #1a1ac8; }
+.bl, .rp .bl { color: #1a1ac8; }
+td.bl { color: #1a1ac8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rp-info b { background: #3a3419; color: #9db4ff; } :root:not([data-theme="light"]) .rp-g .it, :root:not([data-theme="light"]) .bl, :root:not([data-theme="light"]) td.bl { color: #9db4ff; } }
+:root[data-theme="dark"] .rp-info b { background: #3a3419; color: #9db4ff; }
+.exp { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.exp .btn { background: #1e5c4a; }
+.ovl { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.ovb { background: var(--surface); border-radius: 8px; padding: 12px; max-width: 100%; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+.ovb img { max-width: 100%; height: auto; border: 1px solid var(--line); }
+.ovb p { margin: 0; font-size: 13px; color: var(--muted); }
+.bk { display: flex; align-items: center; gap: 6px; margin-top: -10px; padding: 0 4px; font-size: 12.5px; color: var(--muted); }
+.bk .bkl { width: 18px; height: 18px; flex: none; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 560px) {
+  body { padding-inline: 10px; font-size: 15px; }
+  .bar { margin-inline: -10px; padding-inline: 10px; }
+  header { padding-block: 14px 8px; }
+  main { gap: 14px; }
+  input[type=text], input[type=date], input[type=number], select { font-size: 16px; min-height: 46px; padding: 8px 12px; }
+  .btn { min-height: 46px; font-size: 15px; }
+  .tab { padding: 14px 16px; font-size: 15px; }
+  .dcard { padding: 10px 12px; }
+  .dcard .big { font-size: 1.1rem; }
+  .dcard .btn { min-height: 40px; }
+  .panel { padding: 12px; }
+  .fgrid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fgrid .fld:nth-child(1), .fgrid .fld:nth-child(2), .fgrid .fld:nth-child(3), .fgrid .fld:nth-child(4), .fgrid .fld:nth-child(6) { grid-column: 1 / -1; }
+  .fgrid .fld:nth-child(5) { grid-column: 1 / 2; }
+  .fgrid .fld:nth-child(6) { grid-column: 2 / 3; }
+  .lb { max-height: 46vh; }
+  .op { padding: 12px 12px; }
+  .rc { padding: 9px 14px; font-size: 14px; }
+  .ib { width: 42px; height: 42px; }
+  .ib.wide { width: auto; }
+  table.ent { min-width: 0; display: block; }
+  table.ent tbody tr:nth-child(even) td { background: none; }
+  table.ent tbody tr:nth-child(even):not(.tot) { background: var(--bg); }
+  .ent tbody { display: block; }
+  .ent tr.tot td:nth-child(2) { display: none; }
+  .ent tr.tot td:nth-child(3)::after { content: " thùng"; font-weight: 400; }
+  .ent tr.tot td:nth-child(4)::after { content: " đ"; font-weight: 400; }
+  .ent thead { display: none; }
+  .ent tbody tr:not(.tot) { display: grid; grid-template-columns: 1fr 1fr auto; grid-template-areas: "k k a" "p p a" "t d a"; gap: 2px 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .ent tbody tr:not(.tot) td { display: block; padding: 0; border: 0; position: static; min-width: 0; max-width: none; background: none; text-align: left; }
+  .ent tbody tr:not(.tot) td:nth-child(1) { display: none; }
+  .ent tbody tr:not(.tot) td:nth-child(2) { grid-area: k; }
+  .ent tbody tr:not(.tot) td:nth-child(3) { grid-area: p; }
+  .ent tbody tr:not(.tot) td:nth-child(4) { grid-area: t; font-weight: 700; }
+  .ent tbody tr:not(.tot) td:nth-child(4)::after { content: " thùng"; font-weight: 400; color: var(--muted); }
+  .ent tbody tr:not(.tot) td:nth-child(5) { grid-area: d; font-weight: 700; text-align: right; }
+  .ent tbody tr:not(.tot) td:nth-child(5)::after { content: " đ"; font-weight: 400; color: var(--muted); }
+  .ent tbody tr:not(.tot) td:nth-child(6) { grid-area: a; align-self: center; }
+  .ent tr.tot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 10px 12px; background: var(--tint); }
+  .ent tr.tot td { padding: 0; border: 0; min-width: 0; position: static; background: none; }
+  .ent tr.tot td:last-child { display: none; }
+  
+  .band { padding: 10px 12px; }
+  .rp-info { grid-template-columns: 6.5rem 1fr; }
+  .rp-info span, .rp-info b { padding: 8px 10px; font-size: 13.5px; }
+  .rp-t td { padding: 7px 8px; font-size: 13px; }
+  .rp-t th { padding: 7px 8px; }
+  .rp-g { min-width: 0; table-layout: fixed; }
+  .rp-g th, .rp-g td { padding: 6px 2px; font-size: 10.5px; line-height: 1.25; }
+  .rp-g th { font-size: 9px; white-space: normal; }
+  .rp-g th:first-child, .rp-g td:first-child { width: 20%; padding-left: 6px; overflow-wrap: anywhere; }
+  .rp-g th:nth-child(2), .rp-g td:nth-child(2) { width: 7%; text-align: center; }
+  .rp-g td.num, .rp-g th.num { padding-right: 5px; }
+  .rp-g td.num, .rp-g th.num { white-space: normal; }
+  .rp-note { font-size: 11px; }
+  .exp .btn { width: 100%; }
+}
+.rp-w { min-width: 640px; }
+.rp-p { min-width: 1040px; }
+.rp-w { table-layout: auto; }
+.rp-t input.ovr.auto { color: var(--muted); font-weight: 400; opacity: .75; background: var(--surface); border-style: dashed; }
+.rp-t td.nw { white-space: nowrap; }
+.rp-w td:nth-child(2) { min-width: 12rem; }
+.rp-w.rp-p td:nth-child(2) { min-width: 0; }
+.rp-w.rp-p td:first-child { min-width: 10rem; }
+.rp-w td:first-child { min-width: 6.5rem; }
+.rp-w input.ovr:not(.w) { width: 7rem; }
+.rp-s + .rp-s { border-top: 8px solid var(--tint); }
+.rp-t tr.grp td { background: var(--tint); font-weight: 700; color: var(--accent); }
+.rp-t td { vertical-align: middle; }
+.ovr.w { width: 100%; min-width: 7rem; text-align: left; }
+textarea.ovr { font: inherit; font-size: 13px; width: 100%; min-width: 12rem; resize: vertical; text-align: left; border: 1px solid #e0c866; border-radius: 6px; padding: 6px 8px; }
+.rp-info b input.ovr { width: 100%; max-width: 16rem; }
+.rp-info b { display: flex; align-items: center; }
+p.rp-note { margin: 0; border-bottom: 0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ovr { background: #3a3419; color: #9db4ff; border-color: #6b5d22; } }
+:root[data-theme="dark"] .ovr { background: #3a3419; color: #9db4ff; border-color: #6b5d22; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="ttl">Sổ doanh số</h1>
+    <p id="sub"></p>
+  </header>
+  <div class="bar"><div class="tabs" role="tablist" id="tabs"></div></div>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+var D = {"month":"2026-10","agents":[{"m":"2AGNGUYENCHICONG","t":"NGUYỄN CHÍ CÔNG","s":"Nguyễn Chí Công","x":"Châu Phong","n":"Nguyên Bảo","c":"Lúa","nd":80,"d":"T3","dd":"Nguyễn Chí Công","sdt":"0981805894","ap":"Ấp Phú Bình"},{"m":"2AGNAMDU","t":"CÔNG TY TNHH MTV VẬT TƯ NÔNG NGHIỆP NĂM DƯ","s":"Năm Dư","x":"Châu Phong","n":"Tư Nho","c":"Lúa","nd":250,"d":"T2","dd":"Nguyễn Thị Ngọc Giàu","sdt":"0941576352","ap":"Ấp Vĩnh Lợi 1"},{"m":"2AGPHANVANNANG","t":"PHAN VĂN NĂNG","s":"Phan Văn Năng","x":"Châu Phong","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T2","dd":"Phan Văn Năng","sdt":"0919869099","ap":"Ấp Vĩnh Lợi 2"},{"m":"2AGSAUDUNG","t":"HỘ KINH DOANH SÁU DŨNG","s":"Sáu Dũng","x":"Châu Phong","n":"Nguyên Bảo","c":"Lúa","nd":50,"d":"T3","dd":"Trần Thị Kim Anh","sdt":"0987777780","ap":"Ấp Phú Hưng"},{"m":"2AGTHUANTRANG","t":"HỘ KINH DOANH THUẬN TRANG","s":"Thuận Trang","x":"Châu Phong","n":"Nguyên Bảo","c":"Lúa","nd":80,"d":"T3","dd":"Lê Thanh Thuận","sdt":"0989698608","ap":"Ấp Phú An A"},{"m":"2AGDUCNHO","t":"CÔNG TY TNHH MỘT THÀNH VIÊN ĐỨC NHỚ","s":"Đức Nhớ","x":"Châu Phong","n":"Nguyên Bảo","c":"Lúa","nd":50,"d":"T3","dd":"Lê Văn Đức","sdt":"0348101131","ap":"Ấp Phú Hưng"},{"m":"2AGDUCTAI","t":"HỘ KINH DOANH ĐỨC TÀI","s":"Đức Tài","x":"Châu Phong","n":"Tư Nho","c":"Lúa","nd":100,"d":"T2","dd":"Trương Văn Tài","sdt":"0919163277","ap":"Ấp Vĩnh Thạnh"},{"m":"2AGHIEPTHANH","t":"HIỆP THÀNH","s":"Hiệp Thành","x":"Long Phú","n":"Nguyên Bảo","c":"Lúa","nd":200,"d":"T3","dd":"Trần Lê Hiệp","sdt":"0917952624","ap":"Ấp Long Quới C"},{"m":"2AGHUYNHVANPHUONG","t":"HUỲNH VĂN PHƯƠNG","s":"Huỳnh Phương","x":"Long Phú","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T6","dd":"Huỳnh Văn Phương","sdt":"0383449852","ap":"Long Quới B"},{"m":"2AGHKDNGUYENHUUPHUOC","t":"HỘ KINH DOANH THẠC SĨ NGUYỄN HỮU PHƯỚC","s":"Ts Nguyễn Hữu Phước","x":"Long Phú","n":"Tư Nho","c":"Lúa","nd":60,"d":"T6","dd":"Nguyễn Hữu Phước","sdt":"0947707615","ap":"Khóm Long Quới A"},{"m":"2AGUTBI","t":"ÚT BI","s":"Út Bi","x":"Long Phú","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T7","dd":"Trần Văn Bi","sdt":"0356490989","ap":"Khóm Long Quới A"},{"m":"2AGNGUYENTHANHGIANG","t":"HỘ KINH DOANH CỬA HÀNG PHÂN BÓN THUỐC BẢO VỆ THỰC VẬT NGUYỄN THANH GIANG","s":"Thanh Giang","x":"Lê Chánh","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T7","dd":"Nguyễn Thanh Giang","sdt":"0364588397","ap":"Ấp Phú Hữu 1"},{"m":"2AGVTNNANAN","t":"CỬA HÀNG VTNN AN AN","s":"An An","x":"Tân An","n":"Nguyên Bảo","c":"Lúa","nd":150,"d":"T4","dd":"TrầN Thị Mỹ Thi","sdt":"0948634634","ap":"Ấp Long Hiệp"},{"m":"2AGHOTHANHTAM","t":"HỒ THANH TÂM","s":"Hồ Thanh Tâm","x":"Tân An","n":"Nguyên Bảo","c":"Lúa","nd":150,"d":"T4","dd":"Hồ Thanh Tâm","sdt":"0913622798","ap":"Ấp Tân Hậu A2"},{"m":"2AGKHAIDUY","t":"HỘ KINH DOANH CỬA HÀNG VẬT TƯ NÔNG NGHIỆP KHẢI DUY","s":"Khải Duy","x":"Tân An","n":"Tư Nho","c":"Lúa","nd":50,"d":"T5","dd":"Nguyển Thị Huyền Chi","sdt":"0363250219","ap":"Ấp Tân Phú"},{"m":"2AGLEHAI","t":"LÊ HẢI","s":"Lê Hải","x":"Tân An","n":"Tư Nho","c":"Lúa","nd":50,"d":"T5","dd":"Lê Thanh Hải","sdt":"0858122599","ap":"Ấp Giồng Trà Dên"},{"m":"2AGMYDUYEN","t":"HỘ KINH DOANH MỸ DUYÊN","s":"Mỹ Duyên","x":"Tân An","n":"Nguyên Bảo","c":"Rau Màu","nd":60,"d":"T7","dd":"Nguyễn Ngọc Thành","sdt":"0815888005","ap":"Ấp Cộng Lạc"},{"m":"2AGHKDNGOCAN","t":"HỘ KINH DOANH NGỌC AN","s":"Ngọc An","x":"Tân An","n":"Nguyên Bảo","c":"Rau Màu","nd":60,"d":"T7","dd":"Nguyễn Văn Ngọc An","sdt":"0919159104","ap":"Ấp Tân Lợi"},{"m":"2AGTHIEUVANGOP","t":"THIỀU VĂN GÓP","s":"Năm Góp","x":"Tân An","n":"Nguyên Bảo","c":"Rau Màu","nd":100,"d":"T7","dd":"Thiều Văn Góp","sdt":"0969027879","ap":"Hòa Thanh"},{"m":"2AGTAMHIEP","t":"TÁM HIỆP","s":"Tám Hiệp","x":"Tân An","n":"Tư Nho","c":"Lúa","nd":200,"d":"T4","dd":"Lương Bảo Toàn","sdt":"0949679663","ap":"Ấp Tân Hậu A1"},{"m":"2AGNHUNG","t":"ÚT NHUNG","s":"Út Nhung","x":"Tân An","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T2","dd":"Trần Văn Út","sdt":"0942540045","ap":"Ấp Long Thành"},{"m":"2AGBATAM","t":"HỘ KINH DOANH CỬA HÀNG VẬT TƯ NÔNG NGHIỆP BA TÂM","s":"Ba Tâm","x":"Tân Châu","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T4","dd":"Trần Ngọc Gấm","sdt":"0988504940","ap":"Khóm Long Thạnh"},{"m":"2AGHOQUOCKY","t":"HỘ KINH DOANH HỒ QUỐC KỲ","s":"Hồ Quốc Kỳ","x":"Tân Châu","n":"Nguyên Bảo","c":"Lúa","nd":50,"d":"T2","dd":"Hồ Quốc Kỳ","sdt":"0399974516","ap":"Ấp Long Hòa"},{"m":"2AGVTNNLAM","t":"HỘ KINH DOANH VẬT TƯ NÔNG NGHIỆP LÂM","s":"Hộ Kinh Doanh Vật Tư Nông Nghiệp Lâm","x":"Tân Châu","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T4","dd":"Đồng Văn Lâm","sdt":"0988424958","ap":"Tân An"},{"m":"2AGQUOCKIET","t":"HKD CHVTNN TRỊNH QUỐC KIỆT","s":"Quốc Kiệt","x":"Tân Châu","n":"Ngọc Ngân Phú Tân","c":"Lúa","nd":40,"d":"T2","dd":"Trịnh Quốc Việt","sdt":"0833334775","ap":"Ấp Vĩnh Thạnh Ii"},{"m":"2AGTHIENPHAT","t":"HỘ KINH DOANG CỬA HÀNG VẬT TƯ NÔNG NGHIỆP THIỆN PHÁT","s":"Thiện Phát","x":"Tân Châu","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T6","dd":"Nguyễn Thị Mỹ Duyên","sdt":"0859567809","ap":"Khóm Long Quới A"},{"m":"2AGTRANTHANHNHAN","t":"TRẦN THANH NHÀN","s":"Trần Thanh Nhàn","x":"Tân Châu","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T4","dd":"Trần Thanh Nhàn","sdt":"0327336770","ap":"Tân Hậu A1"},{"m":"2AGNGOCHA","t":"HỘ KINH DOANH CỬA HÀNG VTNN KỸ SƯ NGỌC HÀ","s":"Vtnn Kỹ Sư Ngọc Hà","x":"Tân Châu","n":"Nguyên Bảo","c":"Lúa","nd":40,"d":"T6","dd":"Hồ Thị Ngọc Hà","sdt":"0947554199","ap":"Khóm Long Thạnh D"},{"m":"2AGVUONGTRONGHIEU","t":"VƯƠNG TRỌNG HIẾU","s":"Vương Trọng Hiếu","x":"Tân Châu","n":"Tư Nho","c":"Lúa","nd":60,"d":"T6","dd":"Phan Kim Duyên","sdt":"0943344252","ap":"Long Thạnh 1"},{"m":"2AG7HAI","t":"7 HẢI","s":"7 Hải","x":"Vĩnh Xương","n":"Nguyên Bảo","c":"Lúa","nd":150,"d":"T5","dd":"Nguyễn Hồng Hải","sdt":"0977297941","ap":"Ấp Vĩnh Thạnh D"},{"m":"2AGNGUYENTANTHANH","t":"NGUYỄN TẤN THÀNH","s":"Nguyễn Tấn Thành","x":"Vĩnh Xương","n":"Nguyên Bảo","c":"Lúa","nd":200,"d":"T5","dd":"Nguyễn Tấn Thành","sdt":"0979992424","ap":"Ấp Phú Yên"},{"m":"2AGPHONGVI","t":"PHONG VI","s":"Phong Vi","x":"Vĩnh Xương","n":"Nguyên Bảo","c":"Lúa","nd":100,"d":"T5","dd":"Nguyễn Thanh Phong","sdt":"0913107501","ap":"Ấp 1"}],"products":[{"c":"PBLAMIFILK200","n":"Amifol K 200ml","qc":6,"g":1612620,"grp":"Amifol K"},{"c":"TBENHAMISTARTOP250","n":"Amistar Top 325SC 250ml","qc":5,"g":6733020,"grp":"Amistar Top 325SC"},{"c":"TBENHANVIL1000","n":"Anvil 5SC 1lít","qc":12,"g":3412512,"grp":"Anvil 5SC"},{"c":"TTBENHBLASTOGAN75","n":"Blastogan 75WP 75g","qc":7.5,"g":7015300,"grp":"Blastogan 75WP"},{"c":"TTSAUOPAL100","n":"Opal 50WG 100g","qc":5,"g":3851600,"grp":"Opal 50WG"},{"c":"TSAUPEXENA10","n":"Pexena 20WG 10g","qc":2,"g":17618800,"grp":"Pexena 20WG"},{"c":"TBENHRIDOM1KG","n":"Ridomil Gold 68WG 1kg","qc":10,"g":5598650,"grp":"Ridomil Gold 68WG"},{"c":"TKTSTTORA100","n":"Tora 1.1SL 100ml","qc":6,"g":3209160,"grp":"Tora 1.1SL"},{"c":"TSAUVIRTAKO45","n":"Virtako 40WG 4.5g","qc":1.35,"g":5808300,"grp":"Virtako 40WG"},{"c":"TBENHXANTO100","n":"Xantocin 40WP 100g","qc":7,"g":6729310,"grp":"Xantocin 40WP"},{"c":"PBL9RONG011L","n":"9 Rồng 01 1lít","qc":12,"g":1422300,"grp":"9 Rồng 01"},{"c":"TBENHCOMBO500","n":"Combo 600WG 500g","qc":10,"g":2822640,"grp":"Combo 600WG"},{"c":"PBLADELFAN500","n":"Delfan Plus 500ml","qc":10,"g":2676420,"grp":"Delfan Plus"}],"plan":[["2AG7HAI","PBLAMIFILK200","Amifol K 200ml",6,1612620,1,0,0,0],["2AG7HAI","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,1,2,3,1],["2AG7HAI","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,1,1,1,0],["2AG7HAI","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,1,1,1,0],["2AG7HAI","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,1,0],["2AG7HAI","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,1,1,0,0],["2AG7HAI","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,1,1,0,0],["2AG7HAI","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,1,1,0,0],["2AG7HAI","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,1,0,0],["2AG7HAI","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,1,1,0,0],["2AGBATAM","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,2,0],["2AGBATAM","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGBATAM","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGBATAM","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGBATAM","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGBATAM","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGBATAM","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGDUCNHO","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,1,0],["2AGDUCNHO","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGDUCNHO","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGDUCNHO","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGDUCNHO","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,1],["2AGDUCNHO","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGDUCNHO","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGDUCNHO","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,1,0],["2AGDUCTAI","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,1,0],["2AGDUCTAI","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,2,1],["2AGDUCTAI","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGDUCTAI","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGDUCTAI","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGDUCTAI","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGDUCTAI","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGDUCTAI","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,1,0],["2AGHIEPTHANH","PBL9RONG011L","9 Rồng 01 1lít",12,1422300,0,1,0,0],["2AGHIEPTHANH","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,1,0],["2AGHIEPTHANH","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,1,4,3,2],["2AGHIEPTHANH","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,1],["2AGHIEPTHANH","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,1],["2AGHIEPTHANH","TBENHCOMBO500","Combo 600WG 500g",10,2822640,0,1,0,0],["2AGHIEPTHANH","PBLADELFAN500","Delfan Plus 500ml",10,2676420,0,1,1,0],["2AGHIEPTHANH","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,1,0,0],["2AGHIEPTHANH","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,1,0],["2AGHIEPTHANH","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,1,0],["2AGHIEPTHANH","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,0,1,0,0],["2AGHIEPTHANH","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,1,0,0],["2AGHIEPTHANH","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,1,0,0],["2AGHKDNGOCAN","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,1],["2AGHKDNGOCAN","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,1,1],["2AGHKDNGOCAN","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGHKDNGOCAN","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGHKDNGOCAN","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGHKDNGOCAN","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGHKDNGOCAN","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGHKDNGOCAN","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,1,0],["2AGHKDNGUYENHUUPHUOC","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,1],["2AGHKDNGUYENHUUPHUOC","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,1,1],["2AGHKDNGUYENHUUPHUOC","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGHKDNGUYENHUUPHUOC","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGHKDNGUYENHUUPHUOC","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGHKDNGUYENHUUPHUOC","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGHKDNGUYENHUUPHUOC","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGHKDNGUYENHUUPHUOC","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,1,0],["2AGHOQUOCKY","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGHOQUOCKY","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGHOQUOCKY","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGHOQUOCKY","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGHOQUOCKY","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGHOQUOCKY","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGHOQUOCKY","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGHOQUOCKY","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,1],["2AGHOTHANHTAM","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGHOTHANHTAM","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,1,2,3,1],["2AGHOTHANHTAM","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,1],["2AGHOTHANHTAM","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,1],["2AGHOTHANHTAM","PBLADELFAN500","Delfan Plus 500ml",10,2676420,0,1,1,0],["2AGHOTHANHTAM","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGHOTHANHTAM","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,1,0],["2AGHOTHANHTAM","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGHOTHANHTAM","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,0,1,0,0],["2AGHOTHANHTAM","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,1],["2AGHOTHANHTAM","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,1,0,0],["2AGHUYNHVANPHUONG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGHUYNHVANPHUONG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGHUYNHVANPHUONG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGHUYNHVANPHUONG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGHUYNHVANPHUONG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGHUYNHVANPHUONG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGHUYNHVANPHUONG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGKHAIDUY","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGKHAIDUY","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGKHAIDUY","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGKHAIDUY","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGKHAIDUY","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGKHAIDUY","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,0],["2AGKHAIDUY","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGKHAIDUY","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,1],["2AGLEHAI","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGLEHAI","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGLEHAI","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGLEHAI","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGLEHAI","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGLEHAI","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGLEHAI","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,0,0],["2AGLEHAI","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,1],["2AGMYDUYEN","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGMYDUYEN","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,1,1],["2AGMYDUYEN","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGMYDUYEN","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGMYDUYEN","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGMYDUYEN","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGMYDUYEN","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGMYDUYEN","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGNAMDU","PBL9RONG011L","9 Rồng 01 1lít",12,1422300,0,0,1,0],["2AGNAMDU","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGNAMDU","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,1,4,5,2],["2AGNAMDU","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,1,1,1,1],["2AGNAMDU","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,1,1,1,1],["2AGNAMDU","TBENHCOMBO500","Combo 600WG 500g",10,2822640,0,1,0,0],["2AGNAMDU","PBLADELFAN500","Delfan Plus 500ml",10,2676420,0,1,1,0],["2AGNAMDU","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,1,0,0],["2AGNAMDU","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,1,0],["2AGNAMDU","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,1,0],["2AGNAMDU","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,0,0,1,0],["2AGNAMDU","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,1,0,0],["2AGNAMDU","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,1,0,0],["2AGNGOCHA","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGNGOCHA","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGNGOCHA","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGNGOCHA","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGNGOCHA","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGNGOCHA","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGNGOCHA","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGNGUYENCHICONG","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGNGUYENCHICONG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,1,1],["2AGNGUYENCHICONG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGNGUYENCHICONG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGNGUYENCHICONG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGNGUYENCHICONG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGNGUYENCHICONG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGNGUYENCHICONG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGNGUYENTANTHANH","PBL9RONG011L","9 Rồng 01 1lít",12,1422300,0,0,1,0],["2AGNGUYENTANTHANH","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGNGUYENTANTHANH","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,1,3,4,2],["2AGNGUYENTANTHANH","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,1],["2AGNGUYENTANTHANH","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,1],["2AGNGUYENTANTHANH","TBENHCOMBO500","Combo 600WG 500g",10,2822640,0,0,1,0],["2AGNGUYENTANTHANH","PBLADELFAN500","Delfan Plus 500ml",10,2676420,0,0,0,1],["2AGNGUYENTANTHANH","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,1,0,0],["2AGNGUYENTANTHANH","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,1,0],["2AGNGUYENTANTHANH","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,1,0],["2AGNGUYENTANTHANH","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,0,0,1,0],["2AGNGUYENTANTHANH","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,1,0,0],["2AGNGUYENTANTHANH","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,0,1,0],["2AGNGUYENTHANHGIANG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGNGUYENTHANHGIANG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGNGUYENTHANHGIANG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGNGUYENTHANHGIANG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGNGUYENTHANHGIANG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGNGUYENTHANHGIANG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGNGUYENTHANHGIANG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGNHUNG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGNHUNG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGNHUNG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGNHUNG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGNHUNG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGNHUNG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGNHUNG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGPHANVANNANG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGPHANVANNANG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGPHANVANNANG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGPHANVANNANG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGPHANVANNANG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGPHANVANNANG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGPHANVANNANG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGPHONGVI","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGPHONGVI","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,2,1],["2AGPHONGVI","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGPHONGVI","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,0],["2AGPHONGVI","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGPHONGVI","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGPHONGVI","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGPHONGVI","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGPHONGVI","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,0,1,0],["2AGQUOCKIET","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGQUOCKIET","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGQUOCKIET","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGQUOCKIET","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGQUOCKIET","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGQUOCKIET","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGQUOCKIET","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGSAUDUNG","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGSAUDUNG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGSAUDUNG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGSAUDUNG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGSAUDUNG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGSAUDUNG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGSAUDUNG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGSAUDUNG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGTAMHIEP","PBL9RONG011L","9 Rồng 01 1lít",12,1422300,0,0,1,0],["2AGTAMHIEP","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGTAMHIEP","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,1,3,4,2],["2AGTAMHIEP","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,1],["2AGTAMHIEP","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,1],["2AGTAMHIEP","TBENHCOMBO500","Combo 600WG 500g",10,2822640,0,0,1,0],["2AGTAMHIEP","PBLADELFAN500","Delfan Plus 500ml",10,2676420,0,0,0,1],["2AGTAMHIEP","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,1,0,0],["2AGTAMHIEP","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,1,0],["2AGTAMHIEP","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,1,1,0],["2AGTAMHIEP","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,0,0,1,0],["2AGTAMHIEP","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,1,0,0],["2AGTAMHIEP","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,0,1,0],["2AGTHIENPHAT","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGTHIENPHAT","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,0],["2AGTHIENPHAT","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,1,0],["2AGTHIENPHAT","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGTHIENPHAT","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGTHIENPHAT","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGTHIENPHAT","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGTHIEUVANGOP","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGTHIEUVANGOP","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,2,1],["2AGTHIEUVANGOP","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,0],["2AGTHIEUVANGOP","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,0,1],["2AGTHIEUVANGOP","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGTHIEUVANGOP","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,1,0],["2AGTHIEUVANGOP","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGTHIEUVANGOP","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGTHIEUVANGOP","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,0,1,0],["2AGTHUANTRANG","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGTHUANTRANG","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,1,1],["2AGTHUANTRANG","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,0,1],["2AGTHUANTRANG","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,0,1],["2AGTHUANTRANG","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGTHUANTRANG","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,0,1],["2AGTHUANTRANG","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,1,0],["2AGTHUANTRANG","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGTRANTHANHNHAN","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGTRANTHANHNHAN","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,0,1],["2AGTRANTHANHNHAN","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,0,1],["2AGTRANTHANHNHAN","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGTRANTHANHNHAN","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,0,1],["2AGTRANTHANHNHAN","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,0,1],["2AGTRANTHANHNHAN","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGUTBI","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGUTBI","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGUTBI","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,0,1],["2AGUTBI","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,0,1],["2AGUTBI","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGUTBI","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,0,1],["2AGUTBI","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,0,1],["2AGUTBI","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGVTNNANAN","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGVTNNANAN","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,3,3,1],["2AGVTNNANAN","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,1,1,1],["2AGVTNNANAN","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,1,1],["2AGVTNNANAN","PBLADELFAN500","Delfan Plus 500ml",10,2676420,0,1,0,1],["2AGVTNNANAN","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGVTNNANAN","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,1,0,1],["2AGVTNNANAN","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,0,1],["2AGVTNNANAN","TKTSTTORA100","Tora 1.1SL 100ml",6,3209160,0,0,0,1],["2AGVTNNANAN","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGVTNNANAN","TBENHXANTO100","Xantocin 40WP 100g",7,6729310,0,0,0,1],["2AGVTNNLAM","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGVTNNLAM","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,1,1,1],["2AGVTNNLAM","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,0,1],["2AGVTNNLAM","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,0,0,1],["2AGVTNNLAM","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGVTNNLAM","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,0,1],["2AGVTNNLAM","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,0,1],["2AGVTNNLAM","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0],["2AGVUONGTRONGHIEU","PBLAMIFILK200","Amifol K 200ml",6,1612620,0,0,0,0],["2AGVUONGTRONGHIEU","TBENHAMISTARTOP250","Amistar Top 325SC 250ml",5,6733020,0,2,1,1],["2AGVUONGTRONGHIEU","TBENHANVIL1000","Anvil 5SC 1lít",12,3412512,0,0,1,1],["2AGVUONGTRONGHIEU","TTBENHBLASTOGAN75","Blastogan 75WP 75g",7.5,7015300,0,1,0,1],["2AGVUONGTRONGHIEU","TTSAUOPAL100","Opal 50WG 100g",5,3851600,0,0,0,0],["2AGVUONGTRONGHIEU","TSAUPEXENA10","Pexena 20WG 10g",2,17618800,0,0,0,1],["2AGVUONGTRONGHIEU","TBENHRIDOM1KG","Ridomil Gold 68WG 1kg",10,5598650,0,0,0,1],["2AGVUONGTRONGHIEU","TSAUVIRTAKO45","Virtako 40WG 4.5g",1.35,5808300,0,0,0,0]],"catalog":[{"c":"PBL9RONG011L","n":"9 Rồng 01 1lít","g":1422300,"u":"Chai","k":"VFC","q":12,"gr":"9 Rồng 01"},{"c":"PBL9RONG01500ML","n":"9 Rồng 01 500ml","g":1220820,"u":"Chai","k":"VFC","q":10,"gr":"9 Rồng 01"},{"c":"PBLAMIFILK200","n":"Amifol K 200ml","g":1612620,"u":"Chai","k":"VFC","q":6,"gr":"Amifol K"},{"c":"TBENHAMISTARTOP100","n":"Amistar Top 325SC 100ml","g":6952600,"u":"Chai","k":"SYN","q":5,"gr":"Amistar Top 325SC"},{"c":"TBENHAMISTARTOP10","n":"Amistar Top 325SC 10ml","g":5729200,"u":"Chai","k":"SYN","q":4,"gr":"Amistar Top 325SC"},{"c":"TBENHAMISTARTOP10240","n":"Amistar Top 325SC 10ml-240","g":3437520,"u":"Chai","k":"SYN","q":2.4,"gr":"Amistar Top 325SC"},{"c":"TBENHAMISTARTOP200SP","n":"Amistar Top 325SC 200ml SPS","g":5217040,"u":"Chai","k":"SYN","q":4,"gr":"Amistar Top 325SC"},{"c":"TBENHAMISTARTOP250","n":"Amistar Top 325SC 250ml","g":6733020,"u":"Chai","k":"SYN","q":5,"gr":"Amistar Top 325SC"},{"c":"TBENHANVIL100","n":"Anvil 5SC 100ml","g":3000600,"u":"Chai","k":"SYN","q":10,"gr":"Anvil 5SC"},{"c":"TBENHANVIL1000","n":"Anvil 5SC 1lít","g":3412512,"u":"Chai","k":"SYN","q":12,"gr":"Anvil 5SC"},{"c":"TBENHANVIL20","n":"Anvil 5SC 20ml","g":1505520,"u":"Gói","k":"SYN","q":4.8,"gr":"Anvil 5SC"},{"c":"TBENHANVIL250","n":"Anvil 5SC 250ml","g":2927400,"u":"Chai","k":"SYN","q":10,"gr":"Anvil 5SC"},{"c":"TBENHANVIL500SPS","n":"Anvil 5SC 500ml SPS","g":3492816,"u":"Chai","k":"SYN","q":12,"gr":"Anvil 5SC"},{"c":"TCOATAS100","n":"Atas 500EC 100ml","g":1794800,"u":"Chai","k":"VFC","q":10,"gr":"Atas 500EC"},{"c":"TCOATAS500","n":"Atas 500EC 500ml","g":1737440,"u":"Chai","k":"VFC","q":10,"gr":"Atas 500EC"},{"c":"TCOATAS50","n":"Atas 500EC 50ml","g":2234640,"u":"Chai","k":"VFC","q":12,"gr":"Atas 500EC"},{"c":"TBENHBANJO100","n":"Banjo Forte 400SC 100ml","g":6668450,"u":"Chai","k":"SYN","q":5,"gr":"Banjo Forte 400SC"},{"c":"TTBENHBLASTOGAN75","n":"Blastogan 75WP 75g","g":7015300,"u":"Gói","k":"SYN","q":7.5,"gr":"Blastogan 75WP"},{"c":"TBENHCHAM300","n":"Champion 57.6DP 300g","g":4382520,"u":"Gói","k":"VFC","q":12,"gr":"Champion 57.6DP"},{"c":"TBENHCHAMP60","n":"Champion 57.6DP 60g","g":3392850,"u":"Gói","k":"VFC","q":9,"gr":"Champion 57.6DP"},{"c":"TBENHCOMBO100","n":"Combo 600WG 100g","g":2901400,"u":"Gói","k":"VFC","q":10,"gr":"Combo 600WG"},{"c":"TBENHCOMBO500","n":"Combo 600WG 500g","g":2822640,"u":"Gói","k":"VFC","q":10,"gr":"Combo 600WG"},{"c":"PBLADELFA100","n":"Delfan Plus 100ml","g":2844000,"u":"Chai","k":"VFC","q":10,"gr":"Delfan Plus"},{"c":"PBLADELFA250","n":"Delfan Plus 250ml","g":2760800,"u":"Chai","k":"VFC","q":10,"gr":"Delfan Plus"},{"c":"PBLADELFAN500","n":"Delfan Plus 500ml","g":2676420,"u":"Chai","k":"VFC","q":10,"gr":"Delfan Plus"},{"c":"PBLADELFAN500BD","n":"Delfan Plus 500ml (Bung Đọt)","g":2676420,"u":"Chai","k":"VFC","q":10,"gr":"Delfan Plus"},{"c":"PBLADELFAN500NH","n":"Delfan Plus 500ml (Nuôi Hoa)","g":2676420,"u":"Chai","k":"VFC","q":10,"gr":"Delfan Plus"},{"c":"TCODUALG250","n":"Dual Gold 960EC 250ml","g":7197120,"u":"Chai","k":"SYN","q":10,"gr":"Dual Gold 960EC"},{"c":"TCODUALG50","n":"Dual Gold 960EC 50ml","g":7422000,"u":"Chai","k":"SYN","q":10,"gr":"Dual Gold 960EC"},{"c":"TTSAUINCIPIO40","n":"Incipio 100DC 40ml","g":10768700,"u":"Chai","k":"SYN","q":4,"gr":"Incipio 100DC"},{"c":"TTSAUKARAT10","n":"Karate 2.5EC 10ml","g":1396000,"u":"Gói","k":"SYN","q":5,"gr":"Karate 2.5EC"},{"c":"TTSAUKARAT250","n":"Karate 2.5EC 250ml","g":2585880,"u":"Chai","k":"SYN","q":10,"gr":"Karate 2.5EC"},{"c":"TTSAUKARAT50","n":"Karate 2.5EC 50ml","g":1354800,"u":"Chai","k":"SYN","q":5,"gr":"Karate 2.5EC"},{"c":"TCOMAZDA450","n":"Mazda 200SL 450ml","g":2332640,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA450A","n":"Mazda 200SL 450ml A","g":2332640,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA450B","n":"Mazda 200SL 450ml B","g":2332640,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA450C","n":"Mazda 200SL 450ml C","g":2332640,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA450D","n":"Mazda 200SL 450ml D","g":2332640,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA450E","n":"Mazda 200SL 450ml E","g":2332640,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA4L","n":"Mazda 200sL 4L","g":1941508,"u":"Can","k":"VFC","q":16,"gr":"Mazda 200SL"},{"c":"TCOMAZDA900","n":"Mazda 200SL 900ml","g":2226600,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA900A","n":"Mazda 200SL 900ml A","g":2226600,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA900B","n":"Mazda 200SL 900ml B","g":2226600,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA900C","n":"Mazda 200SL 900ml C","g":2226600,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA900E","n":"Mazda 200SL 900ml E","g":2226600,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA900F","n":"Mazda 200SL 900ml F","g":2226600,"u":"Chai","k":"VFC","q":18,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90","n":"Mazda 200SL 90ml","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90A","n":"Mazda 200SL 90ml A","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90B","n":"mazda 200SL 90ml B","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90C","n":"Mazda 200SL 90ml C","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90D","n":"Mazda 200SL 90ml D","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90E","n":"Mazda 200SL 90ml E","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMAZDA90F","n":"Mazda 200SL 90ml F","g":1219400,"u":"Chai","k":"VFC","q":9,"gr":"Mazda 200SL"},{"c":"TCOMICHE1L2","n":"Michelle 62EC 1.2L","g":3540984,"u":"Chai","k":"VFC","q":14.4,"gr":"Michelle 62EC"},{"c":"TCOMICHE100","n":"Michelle 62EC 100ml","g":2601800,"u":"Chai","k":"VFC","q":10,"gr":"Michelle 62EC"},{"c":"TCOMICHE100T","n":"Michelle 62EC 100ml - Chai trắng","g":2601800,"u":"Chai","k":"VFC","q":10,"gr":"Michelle 62EC"},{"c":"TCOMICHE1L","n":"Michelle 62EC 1lít","g":2963988,"u":"Chai","k":"VFC","q":12,"gr":"Michelle 62EC"},{"c":"TCOMICHE500","n":"Michelle 62EC 500ml","g":2535880,"u":"Chai","k":"VFC","q":10,"gr":"Michelle 62EC"},{"c":"TBENHNEVO10480","n":"Nevo 330EC 10ml","g":4032000,"u":"Hũ","k":"SYN","q":4.8,"gr":"Nevo 330EC"},{"c":"TCONOMIF100","n":"Nominee 100OF 100ml","g":5617150,"u":"Chai","k":"VFC","q":5,"gr":"Nominee Of"},{"c":"TCONOMIF50","n":"Nominee 100OF 50ml","g":3468060,"u":"Chai","k":"VFC","q":3,"gr":"Nominee Of"},{"c":"TCONOMIN100","n":"Nominee 10SC 100ml","g":5617150,"u":"Hộp","k":"VFC","q":5,"gr":"Nominee"},{"c":"TCONOMIN10","n":"Nominee 10SC 10ml","g":4903200,"u":"Gói","k":"VFC","q":4,"gr":"Nominee"},{"c":"TCONOMIN20","n":"Nominee 10SC 20ml","g":1423680,"u":"Hộp","k":"VFC","q":1.2,"gr":"Nominee"},{"c":"TCONOMIN50","n":"Nominee 10SC 50ml","g":3468060,"u":"Hộp","k":"VFC","q":3,"gr":"Nominee"},{"c":"TTSAUOPAL100","n":"Opal 50WG 100g","g":3851600,"u":"Gói","k":"VFC","q":5,"gr":"Opal 50WG"},{"c":"TTSAUOPAL15","n":"Opal 50WG 15g","g":4992800,"u":"Gói","k":"VFC","q":6,"gr":"Opal 50WG"},{"c":"TTSAUOPAL25","n":"Opal 50WG 25g","g":3992200,"u":"Gói","k":"VFC","q":5,"gr":"Opal 50WG"},{"c":"TTSAUPEGASUS100SPS","n":"Pegasus 500SC 100ml SPS","g":11931450,"u":"Chai","k":"SYN","q":5,"gr":"Pegasus 500SC"},{"c":"TTSAUPEGAS10","n":"Pegasus 500SC 10ml","g":11527000,"u":"Gói","k":"SYN","q":5,"gr":"Pegasus 500SC"},{"c":"TSAUPEXENA10","n":"Pexena 20WG 10g","g":17618800,"u":"Gói","k":"SYN","q":2,"gr":"Pexena 20WG"},{"c":"TSAUPEXENA625","n":"Pexena 20WG 62.5g","g":31051380,"u":"Gói","k":"SYN","q":3.75,"gr":"Pexena 20WG"},{"c":"TBENHREVUS100","n":"Revus Opti 440SC 100ml","g":3233100,"u":"Chai","k":"SYN","q":5,"gr":"Revus Opti 440SC"},{"c":"TBENHREVUS500","n":"Revus Opti 440SC 500ml","g":3148740,"u":"Chai","k":"SYN","q":5,"gr":"Revus Opti 440SC"},{"c":"TBENHRIDOM100","n":"Ridomil Gold 68WG 100g","g":5765900,"u":"Gói","k":"SYN","q":10,"gr":"Ridomil Gold 68WG"},{"c":"TBENHRIDOM1KG","n":"Ridomil Gold 68WG 1kg","g":5598650,"u":"Gói","k":"SYN","q":10,"gr":"Ridomil Gold 68WG"},{"c":"TTSAUSELEC100","n":"Selecron 500EC 100ml","g":6241300,"u":"Chai","k":"SYN","q":10,"gr":"Selecron 500EC"},{"c":"TTSAUSOLO100","n":"Solo 350SC 100ml","g":4180850,"u":"Chai","k":"VFC","q":5,"gr":"Solo 350SC"},{"c":"TTSAUSOLO10","n":"Solo 350SC 10ml","g":4688500,"u":"Gói","k":"VFC","q":5,"gr":"Solo 350SC"},{"c":"TTSAUSOLO15","n":"Solo 350SC 15ml","g":4103400,"u":"Chai","k":"VFC","q":4.5,"gr":"Solo 350SC"},{"c":"TTSAUSOLO20240","n":"Solo 350SC 20ml","g":4262640,"u":"Gói","k":"VFC","q":4.8,"gr":"Solo 350SC"},{"c":"TTSAUSOLO30","n":"Solo 350SC 30ml","g":5184600,"u":"Gói","k":"VFC","q":6,"gr":"Solo 350SC"},{"c":"TTSAUTERVI100","n":"Tervigo 20SC 100ml","g":7478300,"u":"Chai","k":"SYN","q":10,"gr":"Tervigo 20SC"},{"c":"TTSAUTERVI500","n":"Tervigo 20SC 500ml","g":3626680,"u":"Chai","k":"SYN","q":5,"gr":"Tervigo 20SC"},{"c":"TKTSTTORA100","n":"Tora 1.1SL 100ml","g":3209160,"u":"Chai","k":"VFC","q":6,"gr":"Tora 1.1SL"},{"c":"TKTSTTORA15","n":"Tora 1.1SL 15ml","g":3392800,"u":"Gói","k":"VFC","q":6,"gr":"Tora 1.1SL"},{"c":"TKTSTTORA25","n":"Tora 1.1SL 25ml","g":3307920,"u":"Gói","k":"VFC","q":6,"gr":"Tora 1.1SL"},{"c":"PBLVBACISP500","n":"VBACI SP 500g","g":5982600,"u":"Gói","k":"VFC","q":10,"gr":"Vbaci sp"},{"c":"TSAUVIRTAKO3","n":"Virtako 40WG 3.0g","g":6470000,"u":"Gói","k":"VFC","q":1.5,"gr":"Virtako 40WG"},{"c":"TSAUVIRTAKO45","n":"Virtako 40WG 4.5g","g":5808300,"u":"Gói","k":"SYN","q":1.35,"gr":"Virtako 40WG"},{"c":"TBENHXANTO100","n":"Xantocin 40WP 100g","g":6729310,"u":"Gói","k":"VFC","q":7,"gr":"Xantocin 40WP"},{"c":"TBENHXANTO10M","n":"Xantocin 40WP 10g","g":3317760,"u":"Gói","k":"VFC","q":3.2,"gr":"Xantocin 40WP"},{"c":"TBENHXANTO18","n":"Xantocin 40WP 18g","g":7257200,"u":"Gói","k":"VFC","q":7.2,"gr":"Xantocin 40WP"},{"c":"TBENHSINSMART1L","n":"Sinsmart SC 1L","g":6400000,"u":"Chai","k":"VFC","q":20,"gr":"Sinsmart SC"},{"c":"TBENHSINSMART500ML","n":"Sinsmart SC 500ml","g":3500000,"u":"Chai","k":"VFC","q":10,"gr":"Sinsmart SC"},{"c":"PBLVBACISP100","n":"VBACI SP 100g","g":6500000,"u":"Gói","k":"VFC","q":10,"gr":"Vbaci sp"},{"c":"PBLASEAWEED1L","n":"Ecklonia Maxima Seaweed Extract 1L","g":5400000,"u":"Chai","k":"VFC","q":20,"gr":"SEAWEED"},{"c":"TRUOCMOLLU35","n":"Molluska 700WP 35g","g":2000000,"u":"Gói","k":"VFC","q":7,"gr":"MOLLU"},{"c":"TTOCMOLLUSKA","n":"MOLLUSKA 700WP 100gr","g":1984500,"u":"Gói","k":"VFC","q":7,"gr":"MOLLUSKA 700WP"}]};
+var MONTH = D.month, Y = +MONTH.slice(0, 4), M = +MONTH.slice(5, 7);
+var LAST = new Date(Y, M, 0).getDate();
+var WK = [[1, 7], [8, 14], [15, 21], [22, LAST]];
+var ALLW = [1, 2, 3, 4];
+var DAYS = ["T2", "T3", "T4", "T5", "T6", "T7"];
+var DAYNAME = { T2: "Thứ 2", T3: "Thứ 3", T4: "Thứ 4", T5: "Thứ 5", T6: "Thứ 6", T7: "Thứ 7" };
+var A = {}, P = {}, PL = {};
+D.agents.forEach(function (a) { A[a.m] = a; });
+D.catalog.forEach(function (p) { P[p.c] = p; });
+D.plan.forEach(function (l) { (PL[l[0]] = PL[l[0]] || []).push(l); });
+var SE_NAME = "Nguyễn Duy Khánh";
+
+var nf = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 1 });
+var nf0 = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 });
+function fmt(n) { return nf.format(Math.round(n * 10) / 10); }
+function tr(n) { return nf.format(Math.round(n / 1e5) / 10); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+function weekOf(ds) { var d = +ds.slice(8, 10); return d <= 7 ? 1 : d <= 14 ? 2 : d <= 21 ? 3 : 4; }
+function todayStr() { var t = new Date(); var s = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()); return s.slice(0, 7) === MONTH ? s : MONTH + "-01"; }
+function docId(date, m, sp) { return date.replace(/-/g, "") + "_" + m + "_" + sp; }
+function dmy(ds) { return +ds.slice(8, 10) + "/" + +ds.slice(5, 7); }
+function dmyy(ds) { return ds.slice(8, 10) + "/" + ds.slice(5, 7) + "/" + ds.slice(0, 4); }
+function hms(ts) { if (!ts) return ""; var d = new Date(ts); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
+function keyOfDate(ds) { var g = new Date(+ds.slice(0, 4), +ds.slice(5, 7) - 1, +ds.slice(8, 10)).getDay(); return g >= 1 && g <= 6 ? DAYS[g - 1] : ""; }
+function dayLabel(ds) { var k = keyOfDate(ds); return k ? DAYNAME[k] : "Chủ nhật"; }
+
+function newE(d) { return { date: d, khbl: "", kq: "", sp: "", pq: "", thung: "" }; }
+var T0 = todayStr();
+var S = { tab: "kh", khview: "nhap", kmode: "agent", unit: "thung", q: "", open: {}, kh: {}, th: {}, route: {}, scope: "all", psrc: "file", dd: T0, dp: false, e: { kh: newE(T0), th: newE(T0) }, edit: null, delId: "", dbOk: null, defer: false, ld: "", confReset: false };
+try { var st = localStorage.getItem("sdsse_tab"); if (st) S.tab = st; } catch (e) {}
+var DB = null, ACT = [], ACTK = [], LASTREP = null;
+try { S.lastSave = +localStorage.getItem("sdsse_last") || 0; } catch (e) { S.lastSave = 0; }
+function lsGet(n) { try { var v = localStorage.getItem("sdsse_" + n); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
+function lsSet(n, v) { try { localStorage.setItem("sdsse_" + n, JSON.stringify(v)); } catch (e) {} }
+S.kh = lsGet("kh"); S.th = lsGet("th"); S.route = lsGet("route"); S.ov = lsGet("ov"); S.rp = lsGet("rp");
+
+function mk(store) {
+  return Object.keys(store).map(function (k) {
+    var e = store[k];
+    return { id: k, date: e.date, khbl: e.khbl, sp: e.sp, thung: +e.thung || 0, w: weekOf(e.date), ts: e.ts || 0 };
+  });
+}
+function rebuildAct() { ACT = mk(S.th); ACTK = mk(S.kh); }
+function priceOf(sp) { return P[sp] ? P[sp].g : 0; }
+function fileTot() {
+  var r = { kt: 0, kv: 0 };
+  D.plan.forEach(function (l) { ALLW.forEach(function (w) { r.kt += l[4 + w]; r.kv += l[4 + w] * l[4]; }); });
+  return r;
+}
+function agg(filter, weeks) {
+  var r = { kt: 0, kv: 0, tt: 0, tv: 0 };
+  if (S.psrc === "day") {
+    ACTK.forEach(function (a) { if (weeks.indexOf(a.w) < 0 || !filter(a.khbl, a.sp)) return; r.kt += a.thung; r.kv += a.thung * priceOf(a.sp); });
+  } else {
+    D.plan.forEach(function (l) {
+      if (!filter(l[0], l[1])) return;
+      weeks.forEach(function (w) { var q = l[4 + w]; r.kt += q; r.kv += q * l[4]; });
+    });
+  }
+  ACT.forEach(function (a) { if (weeks.indexOf(a.w) < 0 || !filter(a.khbl, a.sp)) return; r.tt += a.thung; r.tv += a.thung * priceOf(a.sp); });
+  return r;
+}
+function pct(a, b) { return b > 0 ? Math.round(a / b * 100) : null; }
+function meter(p) { return p == null ? "" : '<span class="meter" aria-hidden="true"><i style="width:' + Math.min(100, p) + '%"></i></span>'; }
+function gap(tt, kt) {
+  if (kt <= 0) return '<span class="z">–</span>';
+  var d = tt - kt;
+  return d >= 0 ? '<span class="good">Vượt ' + fmt(d) + '</span>' : '<span class="bad">Thiếu ' + fmt(-d) + '</span>';
+}
+function cell(v) { return '<td class="num">' + (v ? fmt(v) : '<span class="z">–</span>') + "</td>"; }
+function toast(t) {
+  var el = document.getElementById("toast"); el.textContent = t; el.hidden = false;
+  clearTimeout(toast.h); toast.h = setTimeout(function () { el.hidden = true; }, 2600);
+}
+function dayOf(a) { var r = S.route[a.m]; return r ? (r === "none" ? "" : r) : (a.d || ""); }
+function agentsOn(key) { return key ? D.agents.filter(function (a) { return dayOf(a) === key; }) : []; }
+function doneOn(ds, m) { return ACT.some(function (e) { return e.date === ds && e.khbl === m; }); }
+function wkNums(m, w) {
+  var kt = 0, tt = 0;
+  (PL[m] || []).forEach(function (l) { kt += l[4 + w]; });
+  ACT.forEach(function (e) { if (e.khbl === m && e.w === w) tt += e.thung; });
+  return { kt: kt, tt: tt };
+}
+function focusEl(id) { setTimeout(function () { var x = document.getElementById(id); if (x) x.focus(); }, 0); }
+
+/* ---------- Kế hoạch tháng (theo file) ---------- */
+function viewKHMonth() {
+  var q = S.q.trim().toLowerCase(), ds = S.unit === "ds";
+  var tot = fileTot();
+  var h = '<div class="tiles">' +
+    '<div class="tile"><p class="k">Doanh số kế hoạch</p><p class="v">' + tr(tot.kv) + ' triệu</p><p class="s">Cả tháng ' + M + "/" + Y + "</p></div>" +
+    '<div class="tile"><p class="k">Sản lượng kế hoạch</p><p class="v">' + nf0.format(tot.kt) + ' thùng</p><p class="s">' + D.plan.length + " dòng đại lý – sản phẩm</p></div>" +
+    '<div class="tile"><p class="k">Phạm vi</p><p class="v">' + D.agents.length + " đại lý</p><p class=\"s\">" + D.products.length + " sản phẩm</p></div></div>";
+  h += '<div class="controls"><div class="seg" role="group" aria-label="Cách xem">' +
+    '<button data-act="kmode" data-v="agent" aria-pressed="' + (S.kmode === "agent") + '">Theo đại lý</button>' +
+    '<button data-act="kmode" data-v="prod" aria-pressed="' + (S.kmode === "prod") + '">Theo sản phẩm</button></div>' +
+    '<div class="seg" role="group" aria-label="Đơn vị">' +
+    '<button data-act="unit" data-v="thung" aria-pressed="' + !ds + '">Thùng</button>' +
+    '<button data-act="unit" data-v="ds" aria-pressed="' + ds + '">Doanh số (triệu)</button></div>' +
+    '<input type="text" id="kq" class="grow" placeholder="Tìm đại lý, xã, nhà phân phối hoặc sản phẩm" value="' + esc(S.q) + '" aria-label="Tìm kiếm"></div>';
+  function val(l, w) { var x = l[4 + w]; return ds ? x * l[4] / 1e6 : x; }
+  var rows = "", sums = [0, 0, 0, 0, 0], n = 0;
+  if (S.kmode === "agent") {
+    D.agents.forEach(function (a) {
+      if (q && (a.t + " " + a.s + " " + a.x + " " + a.n + " " + a.m).toLowerCase().indexOf(q) < 0 && !PL[a.m].some(function (l) { return l[2].toLowerCase().indexOf(q) >= 0; })) return;
+      var w = [0, 0, 0, 0, 0];
+      PL[a.m].forEach(function (l) { ALLW.forEach(function (k) { w[k - 1] += val(l, k); }); });
+      n++; w.forEach(function (x, i) { sums[i] += x; });
+      var op = !!S.open[a.m];
+      rows += "<tr><td><button class=\"twist\" data-act=\"open\" data-k=\"" + esc(a.m) + '" aria-expanded="' + op + '"><span class="who">' + esc(a.m) + '</span><br><span class="meta">' + esc(a.s) + " · " + esc(a.x) + " · " + esc(a.n) + (dayOf(a) ? " · " + DAYNAME[dayOf(a)] : "") + "</span></button></td>" +
+        w.map(cell).join("") + cell(w.reduce(function (p, c) { return p + c; }, 0)) + "</tr>";
+      if (op) PL[a.m].forEach(function (l) {
+        var t = 0; var c = ALLW.map(function (k) { var v = val(l, k); t += v; return cell(v); }).join("");
+        rows += '<tr class="sub"><td>' + esc(l[2]) + "</td>" + c + cell(t) + "</tr>";
+      });
+    });
+  } else {
+    D.products.forEach(function (p) {
+      if (q && p.n.toLowerCase().indexOf(q) < 0) return;
+      var w = [0, 0, 0, 0, 0], cnt = 0, lines = [];
+      D.plan.forEach(function (l) { if (l[1] === p.c) { cnt++; lines.push(l); ALLW.forEach(function (k) { w[k - 1] += val(l, k); }); } });
+      n++; w.forEach(function (x, i) { sums[i] += x; });
+      var op = !!S.open[p.c];
+      rows += "<tr><td><button class=\"twist\" data-act=\"open\" data-k=\"" + esc(p.c) + '" aria-expanded="' + op + '"><span class="who">' + esc(p.n) + '</span><br><span class="meta">' + cnt + " đại lý</span></button></td>" +
+        w.map(cell).join("") + cell(w.reduce(function (a, b) { return a + b; }, 0)) + "</tr>";
+      if (op) lines.forEach(function (l) {
+        var t = 0; var c = ALLW.map(function (k) { var v = val(l, k); t += v; return cell(v); }).join("");
+        rows += '<tr class="sub"><td>' + esc(A[l[0]].m) + " · " + esc(A[l[0]].s) + "</td>" + c + cell(t) + "</tr>";
+      });
+    });
+  }
+  if (!n) rows = '<tr><td colspan="7" class="empty">Không có dòng nào khớp từ khóa.</td></tr>';
+  else rows += '<tr class="tot"><td>Tổng (' + n + ")</td>" + sums.map(cell).join("") + cell(sums.reduce(function (a, b) { return a + b; }, 0)) + "</tr>";
+  var head = "<th>" + (S.kmode === "agent" ? "Mã KH" : "Sản phẩm") + "</th>" + WK.map(function (r, i) { return '<th class="num">T' + (i + 1) + "<br>" + r[0] + "–" + r[1] + "/" + M + "</th>"; }).join("") + '<th class="num">Cả tháng</th>';
+  h += '<div class="scroll"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+  return h;
+}
+
+/* ---------- Khung nhập dùng chung cho Kế hoạch (kh) và Thực hiện (th) ---------- */
+var ICON_EDIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+var ICON_X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+function listOn(k, date) {
+  return Object.keys(S[k]).map(function (id) { var e = S[k][id]; return { id: id, date: e.date, khbl: e.khbl, sp: e.sp, thung: +e.thung || 0, ts: e.ts || 0 }; })
+    .filter(function (e) { return e.date === date; }).sort(function (a, b) { return a.ts - b.ts; });
+}
+function cbOpts(k, name, q) {
+  q = (q || "").trim().toLowerCase(); var e = S.e[k], out = "";
+  if (name === "khbl") {
+    D.agents.filter(function (a) { return !q || (a.m + " " + a.s + " " + a.x).toLowerCase().indexOf(q) >= 0; }).forEach(function (a) {
+      out += '<button type="button" class="op" data-act="pick" data-n="khbl" data-v="' + esc(a.m) + '"><b>' + esc(a.m) + "</b><span>" + esc(a.s) + " · " + esc(a.x) + (dayOf(a) ? " · " + DAYNAME[dayOf(a)] : "") + "</span></button>";
+    });
+  } else {
+    var inPlan = {}; (PL[e.khbl] || []).forEach(function (l) { if (ALLW.some(function (w) { return l[4 + w] > 0; })) inPlan[l[1]] = l; });
+    var list = D.catalog.filter(function (p) { return !q || p.n.toLowerCase().indexOf(q) >= 0 || p.c.toLowerCase().indexOf(q) >= 0; });
+    var a1 = list.filter(function (p) { return inPlan[p.c]; }), a2 = list.filter(function (p) { return !inPlan[p.c]; });
+    var op = function (p) {
+      var l = inPlan[p.c], t = 0; if (l) ALLW.forEach(function (w) { t += l[4 + w]; });
+      return '<button type="button" class="op" data-act="pick" data-n="sp" data-v="' + esc(p.c) + '"><b>' + esc(p.n) + "</b></button>";
+    };
+    out += a1.map(op).join("") + a2.map(op).join("");
+  }
+  return out || '<div class="op none">Không có kết quả</div>';
+}
+function autoMsg(k) { var e = S.e[k], n = Number(String(e.thung).trim().replace(",", ".")); return (e.khbl && e.sp && n > 0) ? "⏱ Tự động lưu sau 5 giây nếu bạn không nhập thêm (hoặc bấm + THÊM)." : ""; }
+function schedAuto(k) {
+  clearTimeout(S.at); var h = document.getElementById("hint"); if (h) h.textContent = autoMsg(k);
+  if (!autoMsg(k)) return;
+  S.at = setTimeout(function () { if (curK() === k && autoMsg(k)) addEntry(k, true); }, 5000);
+}
+function hintHtml(k) {
+  return autoMsg(k);
+  var e = S.e[k]; if (!e.khbl) return "Chọn mã KH để xem thông tin đại lý.";
+  var a = A[e.khbl], t = 0; (PL[e.khbl] || []).forEach(function (l) { ALLW.forEach(function (w) { t += l[4 + w]; }); });
+  var h = esc(a.s) + " · " + esc(a.ap) + ", " + esc(a.x) + " · NPP " + esc(a.n) + (dayOf(a) ? " · thăm " + DAYNAME[dayOf(a)] : "") + " · kế hoạch tháng " + fmt(t) + " thùng";
+  if (e.sp && P[e.sp]) {
+    var l = (PL[e.khbl] || []).filter(function (x) { return x[1] === e.sp; })[0], wk = weekOf(e.date);
+    h += "<br>" + esc(P[e.sp].n) + ": " + (l ? "kế hoạch tuần " + wk + " là " + fmt(l[4 + wk]) + " thùng" : "không có trong kế hoạch tháng") + " · giá " + nf0.format(P[e.sp].g) + " đ/thùng";
+    if (k === "th") { var kp = S.kh[docId(e.date, e.khbl, e.sp)]; if (kp) h += " · kế hoạch ngày " + fmt(+kp.thung) + " thùng"; }
+  }
+  return h;
+}
+var ICON_CLOUD = '<svg class="bkl" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4.2 4.2 0 0 1-.5 8.5z"/><path d="m9.5 13.5 2 2 3.5-4"/></svg>';
+function bkHtml() { var t = S.lastSave ? hms(S.lastSave) : ""; return ICON_CLOUD + '<span class="bkt">Tự động lưu</span>'; }
+function markSaved() {
+  S.lastSave = Date.now(); try { localStorage.setItem("sdsse_last", String(S.lastSave)); } catch (e) {}
+  var els = document.querySelectorAll(".bk"); for (var i = 0; i < els.length; i++) els[i].innerHTML = bkHtml();
+}
+function dateCard(dd, td) {
+  var h = '<div class="dcard"><div><p class="lab">Ngày hiển thị</p><p class="big">' + (dd === td ? "Hôm nay" : dayLabel(dd)) + " — " + dmyy(dd) + '</p></div><button class="btn warm" data-act="dp" aria-expanded="' + S.dp + '">Chọn ngày ▾</button>';
+  if (S.dp) h += '<div class="dpick"><button class="ib wide" data-act="dstep" data-v="-1" aria-label="Ngày trước">‹ Trước</button><input type="date" id="dd" min="' + MONTH + '-01" max="' + MONTH + "-" + pad(LAST) + '" value="' + esc(dd) + '" aria-label="Chọn ngày hiển thị"><button class="ib wide" data-act="dstep" data-v="1" aria-label="Ngày sau">Sau ›</button><button class="ib wide" data-act="dtoday">Hôm nay</button></div>';
+  h += "</div>";
+  h += '<div class="bk" role="status">' + bkHtml() + "</div>";
+  return h;
+}
+function viewEntry(k) {
+  var kh = k === "kh", e = S.e[k], dd = S.dd, word = kh ? "Kế hoạch" : "Thực hiện", tag = kh ? "KH" : "TH";
+  var tk = keyOfDate(dd), ag = agentsOn(tk), have = {};
+  var rows = listOn(k, dd); rows.forEach(function (r) { have[r.khbl] = 1; });
+  var nd = ag.filter(function (a) { return have[a.m]; }).length, td = todayStr();
+  var h = dateCard(dd, td);
+  h += '<div class="panel"><div class="ph"><span class="badge">' + tag + "</span> Nhập dữ liệu " + word + "</div>";
+  h += '<div class="route"><div class="rh"><b>' + (dd === td ? "Tuyến hôm nay" : "Tuyến ngày " + dmy(dd)) + " (" + dayLabel(dd) + "): " + ag.length + " mã KHBL</b> — bấm chọn nhanh" + (ag.length ? ' <span class="pill">' + nd + "/" + ag.length + " đã " + (kh ? "lên KH" : "nhập TH") + "</span>" : "") + "</div>";
+  h += ag.length ? '<div class="chips">' + ag.map(function (a, i) { return '<button class="rc' + (e.khbl === a.m ? " on" : "") + '" data-act="rc" data-v="' + esc(a.m) + '">' + (i + 1) + ". " + (have[a.m] ? "✓ " : "") + esc(a.m) + "</button>"; }).join("") + "</div>" : "<div>" + (tk ? "Chưa xếp đại lý nào vào " + DAYNAME[tk] + "." : "Chủ nhật không có tuyến.") + "</div>";
+  h += "</div>";
+  h += '<div class="fgrid">' +
+    '<div class="fld"><label for="ed">Ngày ' + tag + '</label><input type="date" id="ed" min="' + MONTH + '-01" max="' + MONTH + "-" + pad(LAST) + '" value="' + esc(e.date) + '"></div>' +
+    '<div class="fld"><span class="fl">SE active</span><input type="text" readonly value="' + SE_NAME + '" aria-label="SE"></div>' +
+    '<div class="fld"><label for="in-khbl">Mã KH KHBL</label><div class="cb" data-n="khbl"><input type="text" class="cbin" id="in-khbl" autocomplete="off" role="combobox" aria-expanded="false" placeholder="Gõ hoặc bấm để chọn mã KH…" value="' + esc(e.kq) + '"><div class="lb" role="listbox" hidden></div></div></div>' +
+    '<div class="fld fw"><label for="in-sp">Sản phẩm</label><div class="cb" data-n="sp"><input type="text" class="cbin" id="in-sp" autocomplete="off" role="combobox" aria-expanded="false" placeholder="Gõ hoặc bấm để chọn sản phẩm…" value="' + esc(e.pq) + '"><div class="lb" role="listbox" hidden></div></div></div>' +
+    '<div class="fld"><label for="in-thung">Số thùng</label><input type="number" id="in-thung" inputmode="decimal" min="0" step="any" placeholder="Thùng" value="' + esc(e.thung) + '"></div>' +
+    '<div class="fld"><button class="btn" data-act="add">+ THÊM</button></div></div>';
+  h += '<p class="hint" id="hint">' + autoMsg(k) + '</p></div>';
+  var tt = 0, tv = 0, ka = {}, kp = {};
+  rows.forEach(function (r) { tt += r.thung; tv += r.thung * priceOf(r.sp); ka[r.khbl] = 1; kp[r.sp] = 1; });
+  h += '<div class="panel flush"><div class="band"><b>' + SE_NAME + "</b><span>" + Object.keys(ka).length + " đại lý · " + Object.keys(kp).length + " sản phẩm · " + fmt(tt) + " thùng</span></div>";
+  if (!rows.length) h += '<p class="empty">Chưa có dòng nào cho ngày ' + dmyy(dd) + ". Chọn mã KH, sản phẩm, nhập số thùng rồi bấm Thêm.</p>";
+  else {
+    h += '<div class="scroll"><table class="ent"><thead><tr><th>Ngày</th><th>Mã KH</th><th>Sản phẩm</th><th class="num">Thùng</th><th class="num">Doanh số (đ)</th><th></th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      var ag2 = A[r.khbl], ed = S.edit && S.edit.k === k && S.edit.id === r.id;
+      var c1 = "<td>" + dmyy(r.date) + '<span class="tm">' + hms(r.ts) + "</span></td><td><b>" + esc(r.khbl) + "</b></td>";
+      if (ed) {
+        var inP = {}; (PL[r.khbl] || []).forEach(function (l) { if (ALLW.some(function (w) { return l[4 + w] > 0; })) inP[l[1]] = 1; });
+        var opt = function (p) { return '<option value="' + esc(p.c) + '"' + (p.c === S.edit.sp ? " selected" : "") + ">" + esc(p.n) + "</option>"; };
+        h += "<tr>" + c1 + '<td><select id="es" aria-label="Sản phẩm" style="width:100%"><optgroup label="Trong kế hoạch tháng">' + D.catalog.filter(function (p) { return inP[p.c]; }).map(opt).join("") + '</optgroup><optgroup label="Sản phẩm khác">' + D.catalog.filter(function (p) { return !inP[p.c]; }).map(opt).join("") + '</optgroup></select></td><td class="num"><input type="number" id="et" inputmode="decimal" min="0" step="any" value="' + esc(S.edit.thung) + '" style="width:6rem;text-align:right" aria-label="Số thùng"></td><td class="num z">–</td><td><div class="acts"><button class="ib wide" data-act="esave">Lưu</button><button class="ib wide x" data-act="ecancel">Hủy</button></div></td></tr>';
+      } else {
+        var cf = S.delId === k + ":" + r.id;
+        h += "<tr>" + c1 + "<td>" + esc(P[r.sp] ? P[r.sp].n : r.sp) + '</td><td class="num">' + fmt(r.thung) + '</td><td class="num">' + nf0.format(r.thung * priceOf(r.sp)) + '</td><td><div class="acts"><button class="ib" data-act="edit" data-id="' + esc(r.id) + '" aria-label="Sửa dòng ' + esc(r.khbl) + '" title="Sửa">' + ICON_EDIT + '</button><button class="ib x' + (cf ? " confirm" : "") + '" data-act="del" data-id="' + esc(r.id) + '" aria-label="Xóa dòng ' + esc(r.khbl) + '" title="Xóa">' + (cf ? "Xóa?" : ICON_X) + "</button></div></td></tr>";
+      }
+    });
+    h += '<tr class="tot"><td>TỔNG</td><td colspan="2"></td><td class="num">' + fmt(tt) + '</td><td class="num">' + nf0.format(tv) + "</td><td></td></tr></tbody></table></div>";
+  }
+  return h + "</div>";
+}
+async function putEntry(k, id, data) {
+  if (data) S[k][id] = data; else delete S[k][id];
+  lsSet(k, S[k]);
+  rebuildAct();
+  if (!DB) { markSaved(); return; }
+  var ref = DB.collection(k).doc(id);
+  if (data) await ref.set(data); else await ref.delete();
+  markSaved();
+}
+async function addEntry(k, auto) {
+  clearTimeout(S.at);
+  var e = S.e[k];
+  if (!e.khbl) { toast("Chọn mã KH trước"); focusEl("in-khbl"); return; }
+  if (!e.sp) { toast("Chọn sản phẩm"); focusEl("in-sp"); return; }
+  var n = Number(String(e.thung).trim().replace(",", "."));
+  if (!(n > 0)) { toast("Nhập số thùng lớn hơn 0"); focusEl("in-thung"); return; }
+  if (!e.date || e.date.slice(0, 7) !== MONTH) { toast("Chọn ngày trong tháng " + M + "/" + Y); focusEl("ed"); return; }
+  var id = docId(e.date, e.khbl, e.sp), ex = !!S[k][id];
+  try { await putEntry(k, id, { date: e.date, khbl: e.khbl, sp: e.sp, thung: n, ts: Date.now() }); }
+  catch (x) { toast("Chưa lưu được, thử lại sau"); render(); return; }
+  toast(auto ? "Đã tự lưu" : ex ? "Dòng này đã có, đã cập nhật số thùng" : "Đã thêm");
+  e.sp = ""; e.pq = ""; e.thung = ""; S.dd = e.date; render(); if (!auto) focusEl("in-sp");
+}
+async function saveEdit() {
+  var ed = S.edit; if (!ed) return;
+  var k = ed.k, sp = document.getElementById("es").value, n = Number(String(document.getElementById("et").value).trim().replace(",", "."));
+  if (!(n > 0)) { toast("Nhập số thùng lớn hơn 0"); return; }
+  var old = S[k][ed.id]; if (!old) { S.edit = null; render(); return; }
+  var nid = docId(old.date, old.khbl, sp), merged = nid !== ed.id && S[k][nid];
+  if (merged) n += +S[k][nid].thung || 0;
+  try {
+    if (nid !== ed.id) await putEntry(k, ed.id, null);
+    await putEntry(k, nid, { date: old.date, khbl: old.khbl, sp: sp, thung: n, ts: Date.now() });
+  } catch (x) { toast("Chưa lưu được, thử lại sau"); render(); return; }
+  S.edit = null; toast(merged ? "Đại lý đã có dòng sản phẩm này, đã cộng dồn số thùng" : "Đã sửa"); render();
+}
+
+/* ---------- Báo cáo ---------- */
+function scopeWeeks() {
+  if (S.scope === "all") return ALLW;
+  if (S.scope === "now") { var w = weekOf(todayStr()), r = []; for (var i = 1; i <= w; i++) r.push(i); return r; }
+  return [+S.scope];
+}
+function viewBC() {
+  var wk = scopeWeeks();
+  var tot = agg(function () { return true; }, wk);
+  var nowW = weekOf(todayStr());
+  var sel = '<div class="controls"><label>Kỳ báo cáo <select id="sc"><option value="all"' + (S.scope === "all" ? " selected" : "") + ">Cả tháng " + M + "</option><option value=\"now\"" + (S.scope === "now" ? " selected" : "") + ">Đến hết tuần " + nowW + "</option>" + ALLW.map(function (i) { return '<option value="' + i + '"' + (S.scope === String(i) ? " selected" : "") + ">Tuần " + i + " (" + WK[i - 1][0] + "–" + WK[i - 1][1] + "/" + M + ")</option>"; }).join("") + "</select></label>" +
+    '<label>Kế hoạch lấy từ <select id="ps"><option value="file"' + (S.psrc === "file" ? " selected" : "") + '>Kế hoạch tháng (file)</option><option value="day"' + (S.psrc === "day" ? " selected" : "") + ">Kế hoạch ngày (đã nhập)</option></select></label></div>";
+  var pv = pct(tot.tv, tot.kv), pt = pct(tot.tt, tot.kt);
+  var active = D.agents.filter(function (a) { return ACT.some(function (e) { return e.khbl === a.m && wk.indexOf(e.w) >= 0; }); }).length;
+  var h = sel + '<div class="tiles">' +
+    '<div class="tile"><p class="k">Doanh số thực hiện</p><p class="v">' + tr(tot.tv) + " / " + tr(tot.kv) + ' triệu</p><p class="s">' + (pv == null ? "Chưa có kế hoạch" : "Đạt " + pv + "% ") + meter(pv) + "</p></div>" +
+    '<div class="tile"><p class="k">Sản lượng thực hiện</p><p class="v">' + fmt(tot.tt) + " / " + fmt(tot.kt) + ' thùng</p><p class="s">' + (pt == null ? "" : "Đạt " + pt + "% · ") + gap(tot.tt, tot.kt) + " thùng</p></div>" +
+    '<div class="tile"><p class="k">Đại lý đã có số</p><p class="v">' + active + " / " + D.agents.length + '</p><p class="s">Trong kỳ đã chọn</p></div></div>';
+  function line(name, sub, r) {
+    var p = pct(r.tt, r.kt);
+    return '<tr><td><span class="who">' + esc(name) + '</span><br><span class="meta">' + esc(sub) + '</span></td><td class="num">' + fmt(r.kt) + '</td><td class="num">' + fmt(r.tt) + '</td><td class="num">' + (p == null ? "–" : p + "%") + "</td><td>" + meter(p) + '</td><td class="num">' + gap(r.tt, r.kt) + '</td><td class="num">' + tr(r.tv) + " / " + tr(r.kv) + "</td></tr>";
+  }
+  var thead = '<thead><tr><th>#</th><th class="num">Kế hoạch (thùng)</th><th class="num">Thực hiện (thùng)</th><th class="num">Đạt</th><th></th><th class="num">Chênh lệch</th><th class="num">Doanh số TH / KH (triệu)</th></tr></thead>';
+  var wrows = ALLW.map(function (i) { return line("Tuần " + i, WK[i - 1][0] + "–" + WK[i - 1][1] + "/" + M, agg(function () { return true; }, [i])); }).join("");
+  h += '<div><h2 class="sec">Theo tuần</h2><div class="scroll"><table>' + thead.replace("#", "Tuần") + "<tbody>" + wrows + "</tbody></table></div></div>";
+  function sorted(list, f) { return list.map(f).sort(function (a, b) { return a.p - b.p; }); }
+  var ar = sorted(D.agents, function (a) { var r = agg(function (m) { return m === a.m; }, wk); return { a: a, r: r, p: r.kt > 0 ? r.tt / r.kt : 9 }; });
+  h += '<div><h2 class="sec">Theo đại lý <span class="meta">(chậm nhất lên đầu)</span></h2><div class="scroll"><table>' + thead.replace("#", "Đại lý") + "<tbody>" + ar.map(function (x) { return line(x.a.m, x.a.s + " · " + x.a.x, x.r); }).join("") + "</tbody></table></div></div>";
+  var codes = {}; D.plan.forEach(function (l) { codes[l[1]] = 1; }); ACT.concat(ACTK).forEach(function (a) { codes[a.sp] = 1; });
+  var pr = sorted(Object.keys(codes), function (c) { var r = agg(function (m, sp) { return sp === c; }, wk); return { c: c, r: r, p: r.kt > 0 ? r.tt / r.kt : 9 }; });
+  h += '<div><h2 class="sec">Theo sản phẩm <span class="meta">(chậm nhất lên đầu)</span></h2><div class="scroll"><table>' + thead.replace("#", "Sản phẩm") + "<tbody>" + pr.map(function (x) { return line(P[x.c] ? P[x.c].n : x.c, P[x.c] ? P[x.c].k : "", x.r); }).join("") + "</tbody></table></div></div>";
+  return h;
+}
+
+/* ---------- Lịch làm việc ---------- */
+
+/* ---------- Mục tiêu và kết quả ngày Territory ---------- */
+function unitOfName(n) { var m = n.match(/(\d+(?:[.,]\d+)?)\s*(ml|lít|l|kg|g)\b/ig); if (!m) return "Lít"; return /(ml|lít|l)$/i.test(m[m.length - 1]) ? "Lít" : "Kg"; }
+function pctS(a, b) { return b > 0 ? (Math.round(a / b * 1000) / 10).toLocaleString("vi-VN", { minimumFractionDigits: 1 }) + "%" : "-"; }
+var FORM = [
+  ["Nhóm chiến lược", [["amistar", "Amistar Top 325SC", "Lít", "Amistar Top 325SC", "250ml", 325000], ["pexena", "Pexena Cốm", "Kg", "Pexena 20WG", "10gr", 65000], ["incipio", "Incipio 100DC", "Lít", "Incipio 100DC", "40ml", 98000], ["blastogan", "Blastogan 75WP", "Kg", "Blastogan 75WP", "70gr", 67000], ["anvil", "Anvil 5SC", "Lít", "Anvil 5SC", "1l", 270000], ["ridomil", "Ridomil Gold 68WG", "Kg", "Ridomil Gold 68WG", "100gr", 55000], ["michelle", "Michelle 62EC", "Lít", "Michelle 62EC", "1l", 227000]]],
+  ["Nhóm phát triển", [["xantocin", "Xantocin 40WP", "Kg", "Xantocin 40WP", "18gr", 15500], ["tora", "Tora 1.1SL", "Lít", "Tora 1.1SL", "25ml", 12500], ["delfan", "Delfan Plus", "Lít", "Delfan Plus", "500ml", 115000]], true],
+  ["Nhóm HC - SH", [["vbaci", "Vbaci SP", "Kg", "Vbaci sp", "", ""], ["9rong", "9 Rồng 01", "Lít", "9 Rồng 01", "", ""], ["sinsmart", "Sinsmart SP", "Lít", "Sinsmart SC", "", ""]]]
+];
+/* Target tháng (lít/kg) theo Sheet1 file T03_C1_SE_SELLOUT_Thang_10 */
+var MT = { "9rong": 48, amistar: 750, anvil: 732, blastogan: 435, delfan: 100, pexena: 78, ridomil: 370, tora: 48, xantocin: 70 };
+var GR2KEY = {}; FORM.forEach(function (g) { g[1].forEach(function (p) { GR2KEY[p[3]] = p[0]; }); });
+var HD = [["kt", "Hoạt động kỹ thuật đồng ruộng"], ["db", "Hoạt động trực tiếp tại điểm bán"]];
+function rpDoc(id) { return S.rp[id] || {}; }
+function has(v) { return v !== undefined && v !== null && v !== ""; }
+function numv(v) { var n = Number(String(v).trim().replace(/\./g, "").replace(",", ".")); return isNaN(n) ? 0 : n; }
+function cfgv(k, def) { var v = rpDoc("cfg")[k]; return has(v) ? v : def; }
+function carry(dd, k) {
+  var ds = Object.keys(S.rp).filter(function (x) { return /^\d{4}-\d\d-\d\d$/.test(x) && x <= dd; }).sort().reverse();
+  for (var i = 0; i < ds.length; i++) { var v = S.rp[ds[i]][k]; if (v !== undefined) return v; }
+  return "";
+}
+function buildRep(dd) {
+  var day = rpDoc(dd), tk = keyOfDate(dd), ag = agentsOn(tk), wk = weekOf(dd);
+  function vol(sp) { var p = P[sp]; return p && p.q ? p.q : 0; }
+  function keyOf(sp) { var p = P[sp], g = p ? p.gr : sp; return GR2KEY[g] || ("o:" + g); }
+  // Target ngày: lấy kế hoạch ngày đã nhập ở tab Kế hoạch; nếu chưa nhập thì lấy kế hoạch tuần của các đại lý trên tuyến hôm đó
+  var kd = ACTK.filter(function (e) { return e.date === dd; });
+  var tSell = 0, tP = {}, src = kd.length ? "day" : "route";
+  if (kd.length) kd.forEach(function (e) { tSell += e.thung * priceOf(e.sp); var k = keyOf(e.sp); tP[k] = (tP[k] || 0) + e.thung * vol(e.sp); });
+  else ag.forEach(function (a) { (PL[a.m] || []).forEach(function (l) { var q = l[4 + wk]; if (!q) return; tSell += q * l[4]; var k = keyOf(l[1]); tP[k] = (tP[k] || 0) + q * vol(l[1]); }); });
+  var kSell = 0, kLk = 0, kP = {}, act = {}, gd = {};
+  ACT.forEach(function (e) {
+    if (e.date > dd) return;
+    var v = e.thung * priceOf(e.sp); kLk += v; act[e.khbl] = 1;
+    if (e.date === dd) { kSell += v; gd[e.khbl] = 1; var k = keyOf(e.sp); kP[k] = (kP[k] || 0) + e.thung * vol(e.sp); }
+  });
+  var ft = fileTot();
+  function ov(k, auto) { return has(day[k]) ? numv(day[k]) : auto; }
+  function mv(k) { return has(day[k]) ? numv(day[k]) : null; }
+  var hd = HD.map(function (h) { var p = "hd_" + h[0] + "_"; return { key: h[0], label: h[1], n: mv(p + "n"), kq: mv(p + "kq"), c2: mv(p + "c2"), gd: mv(p + "gd"), nn: day[p + "nn"] !== undefined ? day[p + "nn"] : carry(dd, p + "nn"), gp: day[p + "gp"] !== undefined ? day[p + "gp"] : carry(dd, p + "gp") }; });
+  var anyHd = hd.some(function (h) { return h.c2 != null || h.gd != null; });
+  var c2hd = anyHd ? hd.reduce(function (s, h) { return s + (h.c2 || 0); }, 0) : null;
+  var c2gd = anyHd ? hd.reduce(function (s, h) { return s + (h.gd || 0); }, 0) : null;
+  var ind = [
+    { g: "1. Sell-out", l: "Giá trị Sell-out", u: "Đồng", tg: ov("tg_sell", tSell), tk: "tg_sell", ta: tSell, kq: kSell, money: 1 },
+    { g: "", l: "Tiến độ lũy kế tháng", u: "Đồng", tg: ft.kv, kq: kLk, money: 1 },
+    { g: "", l: "Số C2 lũy kế Active", u: "C2", tg: D.agents.length, kq: Object.keys(act).length },
+    { g: "2. Tuyến", l: "C2 tiếp cận theo tuyến", u: "C2", tg: ag.length, kq: ov("kq_tt", ag.length), kk: "kq_tt", ka: ag.length },
+    { g: "", l: "C2 có phát sinh giao dịch", u: "C2", tg: ag.length, kq: Object.keys(gd).length },
+    { g: "3. TTTM", l: "Số C2 có đầu tư hoạt động", u: "C2", tg: mv("tg_c2hd"), tk: "tg_c2hd", kq: has(day.kq_c2hd) ? numv(day.kq_c2hd) : c2hd, kk: "kq_c2hd", ka: c2hd },
+    { g: "", l: "Số C2 đã phát sinh giao dịch từ HĐ", u: "C2", tg: mv("tg_c2gd"), tk: "tg_c2gd", kq: has(day.kq_c2gd) ? numv(day.kq_c2gd) : c2gd, kk: "kq_c2gd", ka: c2gd },
+    { g: "", l: "Số ND đã tiếp cận", u: "ND", tg: mv("tg_nd"), tk: "tg_nd", kq: mv("kq_nd"), kk: "kq_nd" },
+    { g: "", l: "Số ND đã chuyển đổi mua hàng", u: "ND", tg: mv("tg_ndcd"), tk: "tg_ndcd", kq: mv("kq_ndcd"), kk: "kq_ndcd" }
+  ];
+  function prow(key, n, u, dt0, gia0) {
+    var pk = "p_" + key + "_", ta = MT[key] || 0;
+    return { key: key, n: n, u: u, ta: ta, tg: has(day[pk + "t"]) ? numv(day[pk + "t"]) : ta, kqa: kP[key] || 0, kqo: has(day[pk + "k"]), kq: has(day[pk + "k"]) ? numv(day[pk + "k"]) : (kP[key] || 0),
+      nn: day[pk + "nn"] !== undefined ? day[pk + "nn"] : carry(dd, pk + "nn"), gp: day[pk + "gp"] !== undefined ? day[pk + "gp"] : carry(dd, pk + "gp"),
+      dt: cfgv("dt_" + key, dt0), gia: cfgv("gia_" + key, gia0) };
+  }
+  var prod = [];
+  FORM.forEach(function (g) {
+    prod.push({ grp: g[0] });
+    g[1].forEach(function (p) { prod.push(prow(p[0], p[1], p[2], p[4], p[5])); });
+    if (g[2]) {
+      var others = {}; Object.keys(kP).forEach(function (k) { if (k.slice(0, 2) === "o:" && kP[k] > 0) others[k] = 1; });
+      Object.keys(day).forEach(function (f) { var m = /^p_(o:.+)_k$/.exec(f); if (m && has(day[f])) others[m[1]] = 1; });
+      Object.keys(others).sort().forEach(function (k) { var nm = k.slice(2); prod.push(prow(k, nm, unitOfName(nm + " " + ((D.catalog.filter(function (c) { return c.gr === nm; })[0] || {}).n || "")), "", "")); });
+    }
+  });
+  return { dd: dd, src: src, nag: ag.length, terr: cfgv("terr", "C1"), tsm: cfgv("tsm", "Nguyễn Vũ Linh"), mdo: cfgv("mdo", "Trương Tấn Phát"),
+    nsSe: has(day.ns_se) ? numv(day.ns_se) : 1, nsMdo: has(day.ns_mdo) ? numv(day.ns_mdo) : 1, ind: ind, prod: prod, hd: hd };
+}
+function f1(v) { return v == null ? "" : fmt(v); }
+function fv(r, v) { return v == null ? "" : r.money ? nf0.format(v) : fmt(v); }
+function diffS(r) { if (r.tg == null || r.kq == null) return ""; var d = r.kq - r.tg; return (d > 0 ? "+" : d < 0 ? "−" : "") + (r.money ? nf0.format(Math.abs(d)) : fmt(Math.abs(d))); }
+function pS(kq, tg) { return kq == null || tg == null ? "" : pctS(kq, tg); }
+function inp(key, val, o) {
+  o = o || {}; var sc = o.cfg ? "cfg" : "day";
+  if (o.ta) return '<textarea class="ovr tx" rows="2" data-rp="' + esc(key) + '" data-sc="' + sc + '" aria-label="' + esc(o.lab || key) + '">' + esc(val) + "</textarea>";
+  return '<input type="' + (o.text ? "text" : "number") + '"' + (o.text ? "" : ' inputmode="decimal" step="any" min="0"') + ' class="ovr' + (o.text ? " w" : "") + (o.auto ? " auto" : "") + '" data-rp="' + esc(key) + '" data-sc="' + sc + '" value="' + esc(val == null ? "" : val) + '"' + (o.ph ? ' placeholder="' + esc(o.ph) + '"' : "") + ' aria-label="' + esc(o.lab || key) + '">';
+}
+function viewDaily() {
+  var dd = S.dd, R = buildRep(dd); LASTREP = R;
+  var h = dateCard(dd, todayStr());
+  h += '<div class="exp"><button class="btn" data-act="exportimg">🖼️ Xuất hình ảnh</button><button class="btn" data-act="export">📊 Xuất file Excel</button></div>';
+  h += '<div class="rp"><div class="rp-title">VFC – MỤC TIÊU VÀ KẾT QUẢ NGÀY TERRITORY</div>' +
+    '<div class="rp-note">Ô <b class="bl">nền vàng</b> là ô anh nhập hoặc sửa được; các ô còn lại tự tính từ tab Thực hiện và kế hoạch tháng. Ô có số tự động mà anh gõ đè thì xóa trống để quay về số tự động. Nguyên nhân, giải pháp tự chép từ ngày gần nhất.</div>' +
+    '<div class="rp-info"><span>Ngày</span><b class="bl">' + dmyy(dd) + " (" + dayLabel(dd) + ')</b><span>Territory</span><b>' + inp("terr", R.terr, { cfg: 1, text: 1, lab: "Territory" }) + '</b><span>TSM</span><b>' + inp("tsm", R.tsm, { cfg: 1, text: 1, lab: "TSM" }) + "</b></div>";
+  // Nhân sự
+  h += '<div class="scroll rp-s"><table class="rp-t rp-w"><thead><tr><th>Nhóm</th><th>Chỉ số</th><th class="c">ĐVT</th><th>NS có</th><th class="num">NS làm việc</th></tr></thead><tbody>' +
+    '<tr><td class="lb2" rowspan="2">Nhân sự</td><td>SE làm việc</td><td class="c">Người</td><td class="nw">' + esc(SE_NAME) + '</td><td class="num">' + inp("ns_se", R.nsSe, { lab: "SE làm việc" }) + "</td></tr>" +
+    '<tr><td>MDO làm việc</td><td class="c">Người</td><td class="nw">' + esc(R.mdo) + '</td><td class="num">' + inp("ns_mdo", R.nsMdo, { lab: "MDO làm việc" }) + "</td></tr></tbody></table></div>";
+  // Chỉ số mục tiêu
+  h += '<div class="scroll rp-s"><table class="rp-t rp-w"><thead><tr><th>Chỉ số mục tiêu</th><th>Chỉ số</th><th class="c">ĐVT</th><th class="num">Target</th><th class="num">Kết quả</th><th class="num">% đạt</th><th class="num">Chênh lệch TH − Target</th></tr></thead><tbody>';
+  R.ind.forEach(function (r) {
+    var tgC = r.tk ? inp(r.tk, r.money ? Math.round(r.tg || 0) : r.tg, { lab: "Target " + r.l, ph: r.ta != null ? String(r.ta) : "" }) : fv(r, r.tg);
+    var kqC = r.kk ? inp(r.kk, r.kq, { lab: "Kết quả " + r.l }) : fv(r, r.kq);
+    h += "<tr>" + (r.g ? '<td class="lb2">' + r.g + "</td>" : "<td></td>") + "<td>" + r.l + '</td><td class="c">' + r.u + '</td><td class="num">' + tgC + '</td><td class="num">' + kqC + '</td><td class="num">' + pS(r.kq, r.tg) + '</td><td class="num">' + diffS(r) + "</td></tr>";
+  });
+  h += "</tbody></table></div>";
+  h += '<p class="rp-note">Target sell-out ngày ' + (R.src === "day" ? "lấy từ kế hoạch ngày ở tab Kế hoạch." : "lấy từ kế hoạch tuần " + weekOf(dd) + " của " + R.nag + " đại lý trên tuyến hôm nay.") + " Bảng sản phẩm: Target là kế hoạch cả tháng (lít/kg) theo Sheet1 file KHDS tháng 10; Kết quả là thực hiện trong ngày, tự lấy từ tab Thực hiện (số mờ). Anh gõ đè để sửa tay, trang tự lưu; xóa trống để về số tự động.</p>";
+  // Sản phẩm
+  h += '<div class="scroll rp-s"><table class="rp-t rp-w rp-p"><thead><tr><th>Sản phẩm</th><th class="c">ĐVT</th><th class="num">Target</th><th class="num">Kết quả</th><th class="num">%</th><th>Nguyên nhân đạt/không</th><th>Giải pháp như thế nào</th><th>Dung tích</th><th class="num">Giá giao dịch</th></tr></thead><tbody>';
+  R.prod.forEach(function (p) {
+    if (p.grp) { h += '<tr class="grp"><td colspan="9">' + esc(p.grp) + "</td></tr>"; return; }
+    var pk = "p_" + p.key + "_";
+    h += '<tr><td class="it">' + esc(p.n) + '</td><td class="c">' + p.u + '</td><td class="num">' + inp(pk + "t", Math.round(p.tg * 100) / 100, { lab: "Target " + p.n, ph: String(Math.round(p.ta * 100) / 100) }) + '</td><td class="num">' + inp(pk + "k", Math.round(p.kq * 100) / 100, { lab: "Kết quả " + p.n, auto: !p.kqo, ph: String(Math.round(p.kqa * 100) / 100) }) + '</td><td class="num">' + pctS(p.kq, p.tg) + "</td><td>" + inp(pk + "nn", p.nn, { ta: 1, lab: "Nguyên nhân " + p.n }) + "</td><td>" + inp(pk + "gp", p.gp, { ta: 1, lab: "Giải pháp " + p.n }) + "</td><td>" + inp("dt_" + p.key, p.dt, { cfg: 1, text: 1, lab: "Dung tích " + p.n }) + '</td><td class="num">' + inp("gia_" + p.key, p.gia, { cfg: 1, lab: "Giá " + p.n }) + "</td></tr>";
+  });
+  h += "</tbody></table></div>";
+  // Hoạt động TTTM
+  h += '<div class="scroll rp-s"><table class="rp-t rp-w rp-p"><thead><tr><th>Hoạt động TTTM</th><th class="num">Số HĐ</th><th class="num">Kết quả</th><th class="num">Số C2 đầu tư</th><th class="num">Số C2 phát sinh giao dịch</th><th>Nguyên nhân đạt/không</th><th>Giải pháp như thế nào</th></tr></thead><tbody>';
+  R.hd.forEach(function (x) {
+    var p = "hd_" + x.key + "_";
+    h += '<tr><td class="lb2">' + x.label + '</td><td class="num">' + inp(p + "n", x.n, { lab: "Số HĐ" }) + '</td><td class="num">' + inp(p + "kq", x.kq, { lab: "Kết quả" }) + '</td><td class="num">' + inp(p + "c2", x.c2, { lab: "Số C2 đầu tư" }) + '</td><td class="num">' + inp(p + "gd", x.gd, { lab: "Số C2 phát sinh giao dịch" }) + "</td><td>" + inp(p + "nn", x.nn, { ta: 1, lab: "Nguyên nhân" }) + "</td><td>" + inp(p + "gp", x.gp, { ta: 1, lab: "Giải pháp" }) + "</td></tr>";
+  });
+  h += "</tbody></table></div></div>";
+  return h;
+}
+function viewReport() { return viewDaily(); }
+function rpSet(sc, key, raw, forId) {
+  var id = sc === "cfg" ? "cfg" : (forId || S.dd), doc = Object.assign({}, rpDoc(id)), v = String(raw);
+  var isText = /_(nn|gp)$/.test(key) || /^(terr|tsm|mdo|dt_)/.test(key);
+  if (isText) doc[key] = v; else if (v.trim() === "") delete doc[key]; else doc[key] = v.trim();
+  S.rp[id] = doc; lsSet("rp", S.rp); markSaved(); toast("Đã lưu");
+  if (DB) DB.collection("rp").doc(id).set(doc).catch(function () { toast("Chưa lưu được lên đám mây"); });
+  clearTimeout(S.rpT); S.rpT = setTimeout(softRender, 350);
+}
+
+/* ---------- Xuất hình ảnh báo cáo ---------- */
+function drawReport(R) {
+  var W = 1400, SC = 2, F = '"Segoe UI", "Be Vietnam Pro", Arial, sans-serif', LN = "#9fb3a6", BLUE = "#1f4e79", GREEN = "#548235", INK = "#14241b", IN = "#1a1ac8";
+  var mc = document.createElement("canvas").getContext("2d");
+  function wrap(ctx, s, w, font) {
+    ctx.font = font; s = String(s == null ? "" : s); var out = [];
+    s.split(/\n/).forEach(function (para) {
+      var words = para.split(" "), line = "";
+      words.forEach(function (wd) { var t = line ? line + " " + wd : wd; if (ctx.measureText(t).width > w - 14 && line) { out.push(line); line = wd; } else line = t; });
+      out.push(line);
+    });
+    return out.slice(0, 5);
+  }
+  function layout(c, draw) {
+    var y = 0;
+    function box(x, yy, w, h, fill) { if (!draw) return; if (fill) { c.fillStyle = fill; c.fillRect(x, yy, w, h); } c.strokeStyle = LN; c.lineWidth = 1; c.strokeRect(x + 0.5, yy + 0.5, w - 1, h - 1); }
+    function table(cols, head, hbg, rows) {
+      var xs = [], a = 0; cols.forEach(function (cl) { xs.push(a); a += cl[0] * W; });
+      var hh = 0; head.forEach(function (t, i) { hh = Math.max(hh, wrap(c, t, cols[i][0] * W, "700 13px " + F).length * 17 + 14); });
+      head.forEach(function (t, i) { var w = cols[i][0] * W; box(xs[i], y, w, hh, hbg); if (draw) cellTxt(t, xs[i], y, w, hh, cols[i][1], "700 13px " + F, "#fff"); });
+      y += hh;
+      rows.forEach(function (r) {
+        if (r.band) { box(0, y, W, 28, "#d9e7d0"); if (draw) cellTxt(r.band, 0, y, W, 28, "l", "700 14px " + F, INK); y += 28; return; }
+        var rh = 30; r.c.forEach(function (t, i) { rh = Math.max(rh, wrap(c, t, cols[i][0] * W, "500 14px " + F).length * 18 + 12); });
+        r.c.forEach(function (t, i) { var w = cols[i][0] * W; box(xs[i], y, w, rh, r.bg || "#fff"); if (draw) cellTxt(t, xs[i], y, w, rh, cols[i][1], (r.b && i === 0 ? "700 " : "500 ") + "14px " + F, (r.col && r.col[i]) || INK); });
+        y += rh;
+      });
+      y += 14;
+    }
+    function cellTxt(t, x, yy, w, h, al, font, col) {
+      var ls = wrap(c, t, w, font); c.font = font; c.fillStyle = col; c.textBaseline = "middle";
+      c.textAlign = al === "r" ? "right" : al === "c" ? "center" : "left";
+      var lh = 18, y0 = yy + h / 2 - (ls.length - 1) * lh / 2;
+      ls.forEach(function (s, i) { c.fillText(s, al === "r" ? x + w - 8 : al === "c" ? x + w / 2 : x + 8, y0 + i * lh + 1); });
+    }
+    if (draw) { c.fillStyle = "#fff"; c.fillRect(0, 0, W, 99999); }
+    box(0, y, W, 46, BLUE); if (draw) cellTxt("VFC – MỤC TIÊU VÀ KẾT QUẢ NGÀY TERRITORY", 0, y, W, 46, "c", "800 19px " + F, "#fff"); y += 46;
+    var iw = W / 6;
+    [["Ngày", dmyy(R.dd)], ["Territory", R.terr], ["TSM", R.tsm]].forEach(function (p, i) {
+      box(i * 2 * iw, y, iw, 32, "#e8f0ea"); box((i * 2 + 1) * iw, y, iw, 32, "#fff6dd");
+      if (draw) { cellTxt(p[0], i * 2 * iw, y, iw, 32, "l", "700 14px " + F, INK); cellTxt(p[1], (i * 2 + 1) * iw, y, iw, 32, "l", "600 14px " + F, IN); }
+    });
+    y += 46;
+    table([[0.18, "l"], [0.3, "l"], [0.1, "c"], [0.27, "l"], [0.15, "r"]], ["Nhóm", "Chỉ số", "ĐVT", "NS có", "NS làm việc"], BLUE, [
+      { c: ["Nhân sự", "SE làm việc", "Người", SE_NAME, f1(R.nsSe)], b: 1 }, { c: ["", "MDO làm việc", "Người", R.mdo, f1(R.nsMdo)] }]);
+    table([[0.13, "l"], [0.3, "l"], [0.07, "c"], [0.14, "r"], [0.14, "r"], [0.09, "r"], [0.13, "r"]], ["Chỉ số mục tiêu", "Chỉ số", "ĐVT", "Target", "Kết quả", "% đạt", "Chênh lệch TH − Target"], BLUE,
+      R.ind.map(function (r) { return { c: [r.g, r.l, r.u, fv(r, r.tg), fv(r, r.kq), pS(r.kq, r.tg), diffS(r)], b: 1 }; }));
+    table([[0.17, "l"], [0.05, "c"], [0.07, "r"], [0.07, "r"], [0.06, "r"], [0.23, "l"], [0.23, "l"], [0.05, "c"], [0.07, "r"]], ["Sản phẩm", "ĐVT", "Target", "Kết quả", "%", "Nguyên nhân đạt/không", "Giải pháp như thế nào", "Dung tích", "Giá giao dịch"], GREEN,
+      R.prod.map(function (p) { return p.grp ? { band: p.grp } : { c: [p.n, p.u, f1(p.tg), f1(p.kq), pctS(p.kq, p.tg), p.nn, p.gp, p.dt, has(p.gia) ? nf0.format(numv(p.gia)) : ""], col: [IN] }; }));
+    table([[0.22, "l"], [0.07, "r"], [0.07, "r"], [0.08, "r"], [0.1, "r"], [0.23, "l"], [0.23, "l"]], ["Hoạt động TTTM", "Số HĐ", "Kết quả", "Số C2 đầu tư", "Số C2 phát sinh giao dịch", "Nguyên nhân đạt/không", "Giải pháp như thế nào"], GREEN,
+      R.hd.map(function (x) { return { c: [x.label, f1(x.n), f1(x.kq), f1(x.c2), f1(x.gd), x.nn, x.gp], b: 1 }; }));
+    return y;
+  }
+  var H = layout(mc, false);
+  var cv = document.createElement("canvas"); cv.width = W * SC; cv.height = H * SC;
+  var c = cv.getContext("2d"); c.scale(SC, SC); layout(c, true);
+  return cv;
+}
+
+/* ---------- Xuất file Excel theo mẫu ---------- */
+function xlsxName(dd) { return "Khánh_Báo cáo ngày_" + dd.slice(8, 10) + "." + dd.slice(5, 7) + "." + dd.slice(0, 4) + ".xlsx"; }
+function crc32(u8) {
+  var t = crc32.t; if (!t) { t = crc32.t = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } }
+  var crc = 0xFFFFFFFF; for (var i = 0; i < u8.length; i++) crc = t[(crc ^ u8[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function zipStore(files) {
+  var enc = new TextEncoder(), parts = [], cen = [], off = 0;
+  function u16(v) { return [v & 255, (v >>> 8) & 255]; }
+  function u32(v) { return [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255]; }
+  files.forEach(function (f) {
+    var name = enc.encode(f[0]), data = enc.encode(f[1]), crc = crc32(data);
+    var lh = [].concat(u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+    parts.push(new Uint8Array(lh), name, data);
+    cen.push([].concat(u32(0x02014b50), u16(20), u16(20), u16(0x0800), u16(0), u16(0), u16(0x21), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(off)), name);
+    off += lh.length + name.length + data.length;
+  });
+  var cs = 0; cen.forEach(function (x) { var a = Array.isArray(x) ? new Uint8Array(x) : x; parts.push(a); cs += a.length; });
+  parts.push(new Uint8Array([].concat(u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length), u32(cs), u32(off), u16(0))));
+  return new Blob(parts, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+}
+function xe(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ""); }
+function colL(c) { var s = ""; c++; while (c > 0) { var m = (c - 1) % 26; s = String.fromCharCode(65 + m) + s; c = Math.floor((c - 1) / 26); } return s; }
+var XL_STYLES = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac x16r2\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:x16r2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/02/main\"><numFmts count=\"3\"><numFmt numFmtId=\"164\" formatCode=\"#,##0.0;\\(#,##0.0\\);\\-\"/><numFmt numFmtId=\"165\" formatCode=\"#,##0;\\(#,##0\\);\\-\"/><numFmt numFmtId=\"166\" formatCode=\"0.0%;\\(0.0%\\);\\-\"/></numFmts><fonts count=\"9\"><font><sz val=\"11\"/><name val=\"Arial\"/></font><font><b/><sz val=\"11\"/><color rgb=\"FFFFFFFF\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF333333\"/><name val=\"Arial\"/></font><font><b/><sz val=\"11\"/><color rgb=\"FF0E4A41\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF0000FF\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF0000FF\"/><name val=\"Arial\"/></font><font><sz val=\"11\"/><color rgb=\"FF000000\"/><name val=\"Arial\"/></font><font><b/><sz val=\"16\"/><color rgb=\"FF0E4A41\"/><name val=\"Arial\"/></font><font><b/><sz val=\"11\"/><color rgb=\"FF0E4A41\"/><name val=\"Arial\"/></font></fonts><fills count=\"7\"><fill><patternFill patternType=\"none\"/></fill><fill><patternFill patternType=\"gray125\"/></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFFFFFF\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFFF2CC\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FF19695B\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFD9EAE6\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFF0F3F2\"/><bgColor indexed=\"64\"/></patternFill></fill></fills><borders count=\"8\"><border><left/><right/><top/><bottom/><diagonal/></border><border><left/><right/><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right/><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left/><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top style=\"thin\"><color rgb=\"FFBFBFBF\"/></top><bottom/><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top/><bottom style=\"thin\"><color rgb=\"FFBFBFBF\"/></bottom><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFBFBFBF\"/></left><right style=\"thin\"><color rgb=\"FFBFBFBF\"/></right><top/><bottom/><diagonal/></border></borders><cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/></cellStyleXfs><cellXfs count=\"39\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"2\" borderId=\"0\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\"/><xf numFmtId=\"164\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"164\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"166\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"164\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"5\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"166\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"3\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"1\" fillId=\"4\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"3\" fillId=\"5\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" indent=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"3\" fillId=\"5\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"5\" fillId=\"3\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"7\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyFont=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\"/></xf><xf numFmtId=\"14\" fontId=\"4\" fillId=\"3\" borderId=\"2\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"4\" fillId=\"3\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"4\" fillId=\"3\" borderId=\"4\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"8\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"8\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"8\" fillId=\"0\" borderId=\"7\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"4\" fillId=\"3\" borderId=\"2\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"5\" fillId=\"3\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf><xf numFmtId=\"165\" fontId=\"6\" fillId=\"6\" borderId=\"3\" xfId=\"0\" applyNumberFormat=\"1\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"right\" vertical=\"center\"/></xf></cellXfs><cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\"/></cellStyles><dxfs count=\"3\"><dxf><font><color rgb=\"FF9C0006\"/></font><fill><patternFill patternType=\"solid\"><fgColor indexed=\"64\"/><bgColor rgb=\"FFFFC7CE\"/></patternFill></fill></dxf><dxf><font><color rgb=\"FF9C5700\"/></font><fill><patternFill patternType=\"solid\"><fgColor indexed=\"64\"/><bgColor rgb=\"FFFFEB9C\"/></patternFill></fill></dxf><dxf><font><color rgb=\"FF006100\"/></font><fill><patternFill patternType=\"solid\"><fgColor indexed=\"64\"/><bgColor rgb=\"FFC6EFCE\"/></patternFill></fill></dxf></dxfs><tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/><extLst><ext uri=\"{EB79DEF2-80B8-43e5-95BD-54CBDDF9020C}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:slicerStyles defaultSlicerStyle=\"SlicerStyleLight1\"/></ext><ext uri=\"{9260A510-F301-46a8-8635-F512D64BE5F5}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:timelineStyles defaultTimelineStyle=\"TimeSlicerStyleLight1\"/></ext></extLst></styleSheet>";
+function buildXlsx(R, modelOnly) {
+  var rows = {}, merges = [], heights = { 1: 8, 2: 30, 3: 8, 4: 21, 5: 8, 6: 8, 7: 8, 8: 36, 11: 36, 21: 8 };
+  function put(r, c, v, s, f) { (rows[r] = rows[r] || {})[c] = { v: v, s: s, f: f }; }
+  function mg(a) { merges.push(a); }
+  function num(v) { return v == null || v === "" || isNaN(+v) ? null : +v; }
+  function lines(t, w) { if (!t) return 1; return String(t).split("\n").reduce(function (n, seg) { return n + Math.max(1, Math.ceil(seg.length / w)); }, 0); }
+  function ni(v) { return v != null && Math.round(v) === v ? 36 : 7; }
+  function pf(r) { return 'IF(AND(ISNUMBER(D' + r + '),ISNUMBER(E' + r + '),D' + r + '>0),E' + r + '/D' + r + ',"")'; }
+  var A = 0, B = 1, C = 2, Dc = 3, E = 4, Fc = 5, G = 6, H = 7, I = 8, J = 9;
+  // Kiểu ô (s) lấy đúng theo file mẫu "Tong hop ngay"
+  for (var c0 = A; c0 <= J; c0++) put(2, c0, c0 === A ? "VFC – MỤC TIÊU VÀ KẾT QUẢ NGÀY TERRITORY" : null, 28);
+  mg("A2:J2");
+  var dser = (Date.UTC(+R.dd.slice(0, 4), +R.dd.slice(5, 7) - 1, +R.dd.slice(8, 10)) - Date.UTC(1899, 11, 30)) / 864e5;
+  put(4, B, "Ngày", 12); put(4, C, dser, 29); put(4, Dc, null, 30); put(4, E, null, 31); mg("C4:E4");
+  put(4, Fc, "Territory", 12); put(4, G, R.terr, 13); put(4, H, "TSM", 12); put(4, I, R.tsm, 35); put(4, J, null, 31); mg("I4:J4");
+  ["Nhóm", "Chỉ số", "ĐVT", "NS có", "NS làm việc"].forEach(function (t, i) { put(8, i, t, 14); });
+  put(9, A, "Nhân sự", 32); put(9, B, "SE làm việc", 15); put(9, C, "Người", 18); put(9, Dc, SE_NAME, 5); put(9, E, num(R.nsSe), 5);
+  put(10, A, null, 33); put(10, B, "MDO làm việc", 16); put(10, C, "Người", 19); put(10, Dc, R.mdo, 9); put(10, E, num(R.nsMdo), 9);
+  mg("A9:A10"); heights[9] = 21; heights[10] = 21;
+  ["Chỉ số mục tiêu", "Chỉ số", "ĐVT", "Target", "Kết quả", "% đạt", "Chênh lệch\nTH − Target"].forEach(function (t, i) { put(11, i, t, 14); });
+  var aSt = [32, 34, 33, 32, 33, 32, 34, 34, 33];
+  R.ind.forEach(function (x, i) {
+    var r = 12 + i, tg = num(x.tg), kq = num(x.kq), money = i < 2;
+    put(r, A, x.g || null, aSt[i]); put(r, B, x.l, 15); put(r, C, x.u, 18);
+    if (money) { tg = tg == null ? null : Math.round(tg); kq = kq == null ? null : Math.round(kq); }
+    put(r, Dc, tg, money ? 37 : 5); put(r, E, kq, money ? 37 : 5);
+    put(r, Fc, tg != null && kq != null && tg > 0 ? kq / tg : "", 6, pf(r));
+    put(r, G, tg != null && kq != null ? kq - tg : "", money ? 38 : 4, 'IF(AND(ISNUMBER(D' + r + '),ISNUMBER(E' + r + ')),E' + r + '-D' + r + ',"")');
+    heights[r] = 21;
+  });
+  mg("A12:A14"); mg("A15:A16"); mg("A17:A20");
+  var r = 22;
+  ["Sản phẩm", "ĐVT", "Target", "Kết quả", "%", "Nguyên nhân đạt/không", "Giải pháp như thế nào", "Dung tích", "Giá giao dịch"].forEach(function (t, i) { put(r, B + i, t, 14); });
+  heights[r] = 36; r++;
+  R.prod.forEach(function (p) {
+    heights[r] = 21;
+    if (p.grp) { put(r, B, p.grp, 20); put(r, C, null, 22); for (var c = Dc; c <= J; c++) put(r, c, null, 20); r++; return; }
+    var tg = num(Math.round(p.tg * 100) / 100), kq = num(Math.round(p.kq * 100) / 100);
+    put(r, B, p.n, 21); put(r, C, p.u, 18); put(r, Dc, tg, ni(tg)); put(r, E, kq, ni(kq));
+    put(r, Fc, tg != null && kq != null && tg > 0 ? kq / tg : "", 10, pf(r));
+    put(r, G, p.nn || null, 23); put(r, H, p.gp || null, 23); put(r, I, p.dt || null, 7); put(r, J, num(p.gia), ni(num(p.gia)));
+    heights[r] = Math.max(21, 15 * Math.max(lines(p.nn, 20), lines(p.gp, 20)) + 4);
+    r++;
+  });
+  heights[r] = 8; r++;
+  ["Hoạt động TTTM", null, "Số HĐ", "Kết quả", "Số C2 đầu tư", "Số C2 phát sinh giao dịch", "Nguyên nhân đạt/không", "Giải pháp như thế nào"].forEach(function (t, i) { put(r, B + i, t, 14); });
+  heights[r] = 36; r++;
+  R.hd.forEach(function (x, i) {
+    var s1 = i === 0 ? [26, 17, 24, 25] : [27, 15, 8, 23];
+    put(r, B, x.label, s1[0]); put(r, C, null, s1[1]);
+    put(r, Dc, num(x.n), s1[2]); put(r, E, num(x.kq), s1[2]); put(r, Fc, num(x.c2), s1[2]); put(r, G, num(x.gd), s1[2]);
+    put(r, H, x.nn || null, s1[3]); put(r, I, x.gp || null, s1[3]);
+    heights[r] = Math.max(30, 15 * Math.max(lines(x.nn, 20), lines(x.gp, 16)) + 4); r++;
+  });
+  var widths = [13.33, 38.33, 9.16, 17.5, 17.5, 17.5, 21.66, 21.66, 17.5, 17.5];
+  Object.keys(heights).forEach(function (h) { rows[h] = rows[h] || {}; });
+  if (modelOnly) return { rows: rows, merges: merges, heights: heights, widths: widths };
+  var sd = Object.keys(rows).map(Number).sort(function (a, b) { return a - b; }).map(function (rr) {
+    var cs = Object.keys(rows[rr]).map(Number).sort(function (a, b) { return a - b; }).map(function (c) {
+      var x = rows[rr][c], ref = colL(c) + rr, a = ' r="' + ref + '" s="' + x.s + '"';
+      if (x.f) return "<c" + a + (typeof x.v === "number" ? "" : ' t="str"') + "><f>" + xe(x.f) + "</f><v>" + xe(x.v == null ? "" : x.v) + "</v></c>";
+      if (x.v == null || x.v === "") return "<c" + a + "/>";
+      if (typeof x.v === "number") return "<c" + a + "><v>" + x.v + "</v></c>";
+      return "<c" + a + ' t="inlineStr"><is><t xml:space="preserve">' + xe(x.v) + "</t></is></c>";
+    }).join("");
+    return '<row r="' + rr + '"' + (heights[rr] ? ' ht="' + heights[rr] + '" customHeight="1"' : "") + ">" + cs + "</row>";
+  }).join("");
+  var sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+    '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0"/></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols>' + widths.map(function (w, i) { return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>'; }).join("") + "</cols>" +
+    "<sheetData>" + sd + "</sheetData>" + (merges.length ? '<mergeCells count="' + merges.length + '">' + merges.map(function (m) { return '<mergeCell ref="' + m + '"/>'; }).join("") + "</mergeCells>" : "") +
+    '<conditionalFormatting sqref="F12:F20"><cfRule type="expression" dxfId="2" priority="1"><formula>AND(ISNUMBER(F12),F12&gt;=1)</formula></cfRule><cfRule type="expression" dxfId="1" priority="2"><formula>AND(ISNUMBER(F12),F12&gt;=0.8,F12&lt;1)</formula></cfRule><cfRule type="expression" dxfId="0" priority="3"><formula>AND(ISNUMBER(F12),F12&lt;0.8)</formula></cfRule></conditionalFormatting>' +
+    '<pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>';
+  var files = [
+    ["[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+    ["_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+    ["xl/workbook.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Tong hop ngay" sheetId="1" r:id="rId1"/></sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>'],
+    ["xl/_rels/workbook.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+    ["xl/styles.xml", XL_STYLES],
+    ["xl/worksheets/sheet1.xml", sheet]
+  ];
+  return zipStore(files);
+}
+async function exportXlsx() {
+  var fe = document.activeElement; if (fe && fe.hasAttribute && fe.hasAttribute("data-rp")) { clearTimeout(fe._rt); if (fe._saved !== fe.value) { fe._saved = fe.value; rpSet(fe.getAttribute("data-sc"), fe.getAttribute("data-rp"), fe.value); } }
+  LASTREP = buildRep(S.dd);
+  var XLSX_NAME = xlsxName(LASTREP.dd);
+  var blob; try { blob = buildXlsx(LASTREP); } catch (e) { toast("Chưa tạo được file Excel"); return; }
+  var dl = null; try { dl = window.claude ? await window.claude.use("downloads") : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename: XLSX_NAME, data: blob }); toast("Đã xuất file Excel"); return; }
+    catch (e) { if (e && e.code === "declined") return; }
+  }
+  try {
+    var f = new File([blob], XLSX_NAME, { type: blob.type });
+    if (!window.claude && navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày" }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = XLSX_NAME; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải file Excel về máy"); } catch (e) { toast("Chưa tải được file Excel"); }
+}
+
+function showImg(src) {
+  var o = document.createElement("div"); o.className = "ovl";
+  o.innerHTML = '<div class="ovb"><p>Nhấn giữ vào ảnh rồi chọn “Lưu ảnh” (điện thoại), hoặc bấm chuột phải rồi “Lưu hình ảnh” (máy tính).</p><img alt="Mục tiêu và kết quả ngày"><button class="btn" type="button">Đóng</button></div>';
+  o.querySelector("img").src = src;
+  o.querySelector("button").onclick = function () { o.remove(); };
+  document.body.appendChild(o);
+}
+/* Ảnh báo cáo: vẽ lại đúng bảng của file Excel (cùng ô, ô gộp, màu, định dạng số) */
+var XS = { 2: { n: 164, f: "calc", a: "r" }, 3: { n: 164, f: "in", a: "r" }, 4: { n: 165, f: "calc", a: "r" }, 5: { n: 165, f: "in", a: "r" }, 6: { n: 166, f: "calc", a: "c" },
+  7: { n: 164, f: "in" }, 8: { n: 165, f: "in", a: "c" }, 9: { n: 165, f: "in", a: "r" }, 10: { n: 166, f: "in", a: "c" }, 11: { nb: 1 }, 12: { b: 1, c: "#0E4A41", a: "r", nb: 1 },
+  13: { f: "in", a: "c" }, 14: { f: "head", a: "c", w: 1 }, 15: {}, 16: {}, 17: {}, 18: { a: "c" }, 19: { a: "c" }, 20: { f: "grp", b: 1 }, 21: { ind: 1 }, 22: { f: "grp", b: 1, a: "c" },
+  23: { f: "in", w: 1 }, 24: { n: 165, f: "in", a: "c" }, 25: { f: "in", w: 1 }, 26: { w: 1 }, 27: { w: 1 }, 28: { b: 1, sz: 21, c: "#0E4A41", a: "c", nb: 1 }, 29: { n: 14, f: "in", a: "c" },
+  30: { f: "in", a: "c" }, 31: { f: "in", a: "c" }, 32: { b: 1, c: "#0E4A41", a: "c", w: 1 }, 33: { b: 1, c: "#0E4A41", a: "c", w: 1 }, 34: { b: 1, c: "#0E4A41", a: "c", w: 1 }, 35: { f: "in", a: "c" },
+  36: { n: 165, f: "in" }, 37: { n: 165, f: "in", a: "r" }, 38: { n: 165, f: "calc", a: "r" } };
+var XFILL = { "in": ["#FFF2CC", "#0000FF"], calc: ["#F0F3F2", "#000000"], head: ["#19695B", "#FFFFFF"], grp: ["#D9EAE6", "#0E4A41"] };
+function xlFmt(v, n) {
+  if (v == null || v === "") return "";
+  if (typeof v !== "number") return String(v);
+  if (n === 14) { var d = new Date(Date.UTC(1899, 11, 30) + v * 864e5); return pad(d.getUTCDate()) + "/" + pad(d.getUTCMonth() + 1) + "/" + d.getUTCFullYear(); }
+  if (!n) return nf.format(v);
+  if (v === 0) return "-";
+  var pct = n === 166, x = Math.abs(pct ? v * 100 : v);
+  var t = new Intl.NumberFormat("vi-VN", { minimumFractionDigits: n === 165 ? 0 : 1, maximumFractionDigits: n === 165 ? 0 : 1 }).format(x) + (pct ? "%" : "");
+  return v < 0 ? "(" + t + ")" : t;
+}
+function drawXl(R) {
+  var M = buildXlsx(R, true), SC = 2, PAD = 14, F = "Arial, Helvetica, sans-serif";
+  var cw = M.widths.map(function (w) { return Math.round(w * 7 + 5); }), cx = [PAD];
+  cw.forEach(function (w, i) { cx[i + 1] = cx[i] + w; });
+  var rnums = Object.keys(M.rows).map(Number).sort(function (a, b) { return a - b; }), last = rnums[rnums.length - 1];
+  var ry = {}, y = PAD;
+  for (var r = 2; r <= last; r++) { ry[r] = y; y += Math.round((M.heights[r] || 15) * 4 / 3); }
+  var H = y + PAD, W = cx[cw.length] + PAD;
+  function rh(r) { return Math.round((M.heights[r] || 15) * 4 / 3); }
+  var mg = {}, cover = {};
+  M.merges.forEach(function (ref) {
+    var m = /^([A-Z])(\d+):([A-Z])(\d+)$/.exec(ref); if (!m) return;
+    var c1 = m[1].charCodeAt(0) - 65, r1 = +m[2], c2 = m[3].charCodeAt(0) - 65, r2 = +m[4];
+    mg[r1 + ":" + c1] = { c2: c2, r2: r2 };
+    for (var rr = r1; rr <= r2; rr++) for (var cc = c1; cc <= c2; cc++) if (rr !== r1 || cc !== c1) cover[rr + ":" + cc] = 1;
+  });
+  var cv = document.createElement("canvas"); cv.width = W * SC; cv.height = H * SC;
+  var c = cv.getContext("2d"); c.scale(SC, SC); c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, W, H); c.textBaseline = "middle";
+  function wrapLines(t, w, font) {
+    c.font = font; var out = [];
+    String(t).split("\n").forEach(function (para) {
+      var line = ""; para.split(" ").forEach(function (wd) { var tt = line ? line + " " + wd : wd; if (c.measureText(tt).width > w && line) { out.push(line); line = wd; } else line = tt; });
+      out.push(line);
+    });
+    return out;
+  }
+  var texts = [];
+  rnums.forEach(function (r) {
+    if (r < 2) return;
+    Object.keys(M.rows[r]).map(Number).forEach(function (col) {
+      var key = r + ":" + col; if (cover[key]) return;
+      var cell = M.rows[r][col], st = XS[cell.s] || {}, m = mg[key];
+      var x0 = cx[col], x1 = cx[(m ? m.c2 : col) + 1], y0 = ry[r], y1 = m ? ry[m.r2] + rh(m.r2) : y0 + rh(r);
+      var fill = st.f ? XFILL[st.f][0] : null, color = st.f ? XFILL[st.f][1] : (st.c || "#333333");
+      var v = cell.v, isPct = st.n === 166 && col === 5 && r >= 12 && r <= 20 && typeof v === "number";
+      if (isPct) { if (v >= 1) { fill = "#C6EFCE"; color = "#006100"; } else if (v >= 0.8) { fill = "#FFEB9C"; color = "#9C5700"; } else { fill = "#FFC7CE"; color = "#9C0006"; } }
+      if (fill) { c.fillStyle = fill; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
+      if (!st.nb) { c.strokeStyle = "#BFBFBF"; c.lineWidth = 1; c.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0, y1 - y0); }
+      var txt = xlFmt(v, st.n); if (!txt) return;
+      var al = st.a || (typeof v === "number" ? "r" : "l");
+      texts.push({ t: txt, x0: x0, x1: x1, y0: y0, y1: y1, al: al, color: color, font: (st.b ? "bold " : "") + (st.sz || 14) + "px " + F, wrap: st.w, ind: st.ind, r: r, col: col });
+    });
+  });
+  texts.forEach(function (o) {
+    var x1 = o.x1;
+    if (!o.wrap && o.al === "l") { for (var k = o.col + 1; k < cw.length; k++) { var nx = M.rows[o.r][k]; if (nx && nx.v != null && nx.v !== "") break; if (cover[o.r + ":" + k]) break; x1 = cx[k + 1]; } }
+    var w = x1 - o.x0 - 10 - (o.ind ? 10 : 0);
+    var lines = o.wrap ? wrapLines(o.t, w, o.font) : [o.t];
+    c.save(); c.beginPath(); c.rect(o.x0 + 1, o.y0 + 1, x1 - o.x0 - 2, o.y1 - o.y0 - 2); c.clip();
+    c.font = o.font; c.fillStyle = o.color; c.textAlign = o.al === "r" ? "right" : o.al === "c" ? "center" : "left";
+    var lh = 17, ty = (o.y0 + o.y1) / 2 - (lines.length - 1) * lh / 2 + 1;
+    lines.forEach(function (ln, i) { c.fillText(ln, o.al === "r" ? o.x1 - 5 : o.al === "c" ? (o.x0 + o.x1) / 2 : o.x0 + 5 + (o.ind ? 10 : 0), ty + i * lh); });
+    c.restore();
+  });
+  return cv;
+}
+function imgName(dd) { return "Khánh_Báo cáo ngày_" + dd.slice(8, 10) + "." + dd.slice(5, 7) + "." + dd.slice(0, 4) + ".png"; }
+async function exportImg() {
+  var fe = document.activeElement; if (fe && fe.hasAttribute && fe.hasAttribute("data-rp")) { clearTimeout(fe._rt); if (fe._saved !== fe.value) { fe._saved = fe.value; rpSet(fe.getAttribute("data-sc"), fe.getAttribute("data-rp"), fe.value); } }
+  LASTREP = buildRep(S.dd);
+  var cv; try { cv = drawXl(LASTREP); } catch (e) { toast("Chưa tạo được ảnh"); return; }
+  var blob = await new Promise(function (r) { cv.toBlob(r, "image/png"); });
+  if (!blob) { toast("Chưa tạo được ảnh"); return; }
+  var fn = imgName(LASTREP.dd);
+  var dl = null; try { dl = window.claude ? await window.claude.use("downloads") : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename: fn, data: blob }); toast("Đã xuất ảnh"); return; }
+    catch (e) { if (e && e.code === "declined") return; }
+  }
+  if (!window.claude) {
+    try {
+      var f = new File([blob], fn, { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày" }); return; }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải ảnh về máy"); return; } catch (e) {}
+  }
+  showImg(cv.toDataURL("image/png"));
+}
+
+function visitCard(a, sel, w) {
+  var d = doneOn(sel, a.m), n = wkNums(a.m, w);
+  return '<div class="visit"><div class="vh"><span class="who">' + esc(a.s) + "</span>" + (d ? '<span class="good">Đã nhập</span>' : '<span class="bad">Chưa nhập</span>') + "</div>" +
+    '<div class="meta">' + esc(a.m) + " · " + esc(a.ap) + ", " + esc(a.x) + " · NPP " + esc(a.n) + "</div>" +
+    '<div class="meta">' + esc(a.dd) + (a.sdt ? " · " + esc(a.sdt) : "") + "</div>" +
+    '<div class="meta">Tuần ' + w + ": kế hoạch " + fmt(n.kt) + " · thực hiện " + fmt(n.tt) + " thùng</div>" +
+    '<button class="btn sm" data-act="go" data-m="' + esc(a.m) + '" data-d="' + sel + '">Nhập số liệu</button></div>';
+}
+function viewLich() {
+  var td = todayStr(), sel = S.ld || td, tk = keyOfDate(sel), w = weekOf(sel), list = agentsOn(tk), h = "";
+  h += '<div class="panel"><h2>' + (sel === td ? "Hôm nay" : "Ngày") + " " + dmy(sel) + " (" + dayLabel(sel) + ")</h2>";
+  if (!tk) h += '<p class="empty">Chủ nhật không có tuyến.</p>';
+  else if (!list.length) h += '<p class="empty">Chưa xếp đại lý nào vào ' + DAYNAME[tk] + ".</p>";
+  else {
+    var dn = list.filter(function (a) { return doneOn(sel, a.m); }).length;
+    h += '<p class="meta">Tuyến ' + DAYNAME[tk] + ": " + list.length + " đại lý · đã nhập số " + dn + "/" + list.length + '</p><div class="visits">' + list.map(function (a) { return visitCard(a, sel, w); }).join("") + "</div>";
+  }
+  h += "</div>";
+  var off = (new Date(Y, M - 1, 1).getDay() + 6) % 7, cells = "";
+  for (var i = 0; i < off; i++) cells += "<div></div>";
+  for (var d = 1; d <= LAST; d++) {
+    var ds = Y + "-" + pad(M) + "-" + pad(d), k = keyOfDate(ds), ag = agentsOn(k);
+    var dn2 = ag.filter(function (a) { return doneOn(ds, a.m); }).length, past = ds <= td;
+    var sub = !k ? "Nghỉ" : past ? dn2 + "/" + ag.length : ag.length + " đl";
+    var cls = "cd" + (ds === td ? " today" : "") + (ds === sel ? " sel" : "") + (!k ? " off" : "") + (k && past && dn2 < ag.length ? " miss" : "");
+    cells += '<button class="' + cls + '" data-act="ld" data-d="' + ds + '" aria-label="Ngày ' + d + ", " + sub + '"><b>' + d + "</b><span>" + sub + "</span></button>";
+  }
+  h += '<div class="panel"><h2>Lịch tháng ' + M + "/" + Y + '</h2><div class="cal">' + ["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map(function (n) { return '<div class="ch">' + n + "</div>"; }).join("") + cells + '</div><p class="meta">Ngày đã qua hiện số đại lý đã nhập trên số đại lý theo tuyến. Màu đỏ là còn thiếu.</p></div>';
+  var un = D.agents.filter(function (a) { return !dayOf(a); }).length;
+  h += '<div class="panel"><h2>Xếp tuyến theo thứ' + (un ? ' <span class="meta">· ' + un + " đại lý chưa xếp</span>" : "") + '</h2><p class="meta">Mặc định theo file định tuyến T09. Đổi ngày ở đây sẽ áp dụng cho cả lịch tháng.</p><div class="scroll"><table><thead><tr><th>Đại lý</th><th>Ngày thăm cố định</th></tr></thead><tbody>' + D.agents.map(function (a) {
+    return '<tr><td><span class="who">' + esc(a.m) + '</span><br><span class="meta">' + esc(a.s) + " · " + esc(a.ap) + ", " + esc(a.x) + '</span></td><td><select data-act="route" data-m="' + esc(a.m) + '" aria-label="Ngày thăm ' + esc(a.s) + '"><option value="">Chưa xếp</option>' + DAYS.map(function (x) { return '<option value="' + x + '"' + (dayOf(a) === x ? " selected" : "") + ">" + DAYNAME[x] + "</option>"; }).join("") + "</select></td></tr>";
+  }).join("") + '</tbody></table></div><div class="controls" style="margin-top:12px"><button class="btn ghost sm" data-act="resetroute">' + (S.confReset ? "Bấm lại để khôi phục" : "Khôi phục tuyến theo file") + "</button></div></div>";
+  return h;
+}
+
+/* ---------- Khung chung ---------- */
+var TABS = [["kh", "Kế hoạch"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"]];
+if (!TABS.some(function (x) { return x[0] === S.tab; })) S.tab = "kh";
+function viewKH() { return viewEntry("kh"); }
+function render() {
+  var v = document.getElementById("view");
+  document.getElementById("ttl").textContent = S.tab === "bc" ? "Mục tiêu & kết quả ngày" : "Báo cáo ngày";
+  document.getElementById("tabs").innerHTML = TABS.map(function (t) { return '<button class="tab" role="tab" data-act="tab" data-v="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + t[1] + "</button>"; }).join("");
+  var body = S.tab === "th" ? viewEntry("th") : S.tab === "bc" ? viewReport() : viewKH();
+  var note = S.dbOk === false ? '<div class="banner">Chế độ xem này chưa nối được kho dữ liệu trên tài khoản. Số bạn nhập vẫn được tự lưu trên trình duyệt của máy này; mở trang từ thẻ Artifact trong ứng dụng Claude để lưu lên tài khoản.</div>' : "";
+  v.innerHTML = note + body;
+  if (S.restoreQ) { var q = document.getElementById("kq"); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } S.restoreQ = false; }
+}
+function softRender() {
+  var el = document.activeElement;
+  if (el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) && document.getElementById("view").contains(el)) { S.defer = true; return; }
+  render();
+}
+function curK() { return S.tab === "th" ? "th" : "kh"; }
+function closeCbs() {
+  var ls = document.querySelectorAll(".lb"); for (var i = 0; i < ls.length; i++) { ls[i].hidden = true; }
+  var ins = document.querySelectorAll(".cbin"); for (var j = 0; j < ins.length; j++) ins[j].setAttribute("aria-expanded", "false");
+}
+function openCb(input, q) {
+  var cb = input.closest(".cb"), lb = cb.querySelector(".lb"), name = cb.getAttribute("data-n");
+  closeCbs();
+  lb.innerHTML = cbOpts(curK(), name, q); lb.hidden = false; input.setAttribute("aria-expanded", "true");
+}
+function pick(name, v) {
+  var k = curK(), e = S.e[k];
+  if (name === "khbl") {
+    e.khbl = v; e.kq = v;
+    var i1 = document.getElementById("in-khbl"); if (i1) i1.value = v;
+    closeCbs(); schedAuto(k); focusEl("in-sp");
+  } else {
+    e.sp = v; e.pq = P[v].n;
+    var i2 = document.getElementById("in-sp"); if (i2) i2.value = P[v].n;
+    closeCbs(); schedAuto(k); focusEl("in-thung");
+  }
+}
+function commitOvr(val) {
+  var ds0 = S.dd, raw = String(val).trim();
+  if (raw === "" || isNaN(+raw)) { delete S.ov[ds0]; if (DB) DB.collection("ov").doc(ds0).delete().catch(function () {}); }
+  else { S.ov[ds0] = { v: Math.max(0, Math.round(+raw)) }; if (DB) DB.collection("ov").doc(ds0).set(S.ov[ds0]).catch(function () {}); }
+  lsSet("ov", S.ov); markSaved(); toast("Đã lưu"); render();
+}
+function setDD(ds) {
+  if (!ds || ds.slice(0, 7) !== MONTH) return;
+  S.dd = ds; S.e.kh.date = ds; S.e.th.date = ds; S.edit = null; render();
+}
+document.getElementById("ttl").textContent = "Báo cáo ngày";
+document.getElementById("sub").textContent = SE_NAME + " · SE Tân Châu · " + D.agents.length + " đại lý";
+
+var view = document.getElementById("view");
+document.getElementById("tabs").addEventListener("click", function (ev) {
+  var b = ev.target.closest("[data-act=tab]"); if (!b) return;
+  clearTimeout(S.at); S.tab = b.getAttribute("data-v"); S.edit = null; try { localStorage.setItem("sdsse_tab", S.tab); } catch (x) {}
+  render(); window.scrollTo(0, 0);
+});
+view.addEventListener("click", function (ev) {
+  var t = ev.target.closest("[data-act]");
+  if (!t) { if (!ev.target.closest(".cb")) closeCbs(); return; }
+  var act = t.getAttribute("data-act"), k = curK();
+  if (act !== "pick" && !t.closest(".cb")) closeCbs();
+  if (act === "pick") pick(t.getAttribute("data-n"), t.getAttribute("data-v"));
+  else if (act === "kmode") { S.kmode = t.getAttribute("data-v"); render(); }
+  else if (act === "unit") { S.unit = t.getAttribute("data-v"); render(); }
+  else if (act === "export") { exportXlsx(); }
+  else if (act === "exportimg") { exportImg(); }
+  else if (act === "bcview") { S.bcview = t.getAttribute("data-v"); render(); }
+  else if (act === "khview") { S.khview = t.getAttribute("data-v"); render(); }
+  else if (act === "open") { var kk = t.getAttribute("data-k"); S.open[kk] = !S.open[kk]; render(); }
+  else if (act === "dp") { S.dp = !S.dp; render(); }
+  else if (act === "dstep") { var d0 = new Date(+S.dd.slice(0, 4), +S.dd.slice(5, 7) - 1, +S.dd.slice(8, 10) + (+t.getAttribute("data-v"))); setDD(d0.getFullYear() + "-" + pad(d0.getMonth() + 1) + "-" + pad(d0.getDate())); }
+  else if (act === "dtoday") { setDD(todayStr()); }
+  else if (act === "rc") { var m = t.getAttribute("data-v"); S.e[k].khbl = m; S.e[k].kq = m; render(); focusEl("in-sp"); }
+  else if (act === "add") { addEntry(k); }
+  else if (act === "edit") { var id = t.getAttribute("data-id"), r = S[k][id]; if (r) { S.edit = { k: k, id: id, sp: r.sp, thung: String(r.thung) }; S.delId = ""; render(); focusEl("et"); } }
+  else if (act === "ecancel") { S.edit = null; render(); }
+  else if (act === "esave") { saveEdit(); }
+  else if (act === "del") {
+    var did = k + ":" + t.getAttribute("data-id");
+    if (S.delId !== did) { S.delId = did; render(); return; }
+    S.delId = ""; putEntry(k, t.getAttribute("data-id"), null).then(function () { toast("Đã xóa"); render(); }, function () { toast("Chưa xóa được"); render(); });
+  }
+  else if (act === "go") { var gm = t.getAttribute("data-m"), gd = t.getAttribute("data-d") || todayStr(); S.dd = gd; S.e.th = newE(gd); S.e.th.khbl = gm; S.e.th.kq = gm; S.e.kh.date = gd; S.tab = "th"; S.edit = null; render(); window.scrollTo(0, 0); focusEl("in-sp"); }
+  else if (act === "ld") { S.ld = t.getAttribute("data-d"); render(); }
+  else if (act === "resetroute") {
+    if (!S.confReset) { S.confReset = true; render(); return; }
+    S.confReset = false; var ids = Object.keys(S.route); S.route = {}; lsSet("route", S.route); render();
+    if (DB) ids.forEach(function (rid) { DB.collection("route").doc(rid).delete().catch(function () {}); });
+    toast("Đã khôi phục tuyến theo file");
+  }
+});
+view.addEventListener("focusin", function (ev) {
+  var t = ev.target;
+  if (t.classList && t.classList.contains("cbin")) { openCb(t, ""); t.select(); }
+  else if (!t.closest(".cb")) closeCbs();
+});
+view.addEventListener("input", function (ev) {
+  var t = ev.target, k = curK();
+  if (t.id === "kq") { S.q = t.value; S.restoreQ = true; render(); }
+  else if (t.classList && t.classList.contains("cbin")) {
+    var name = t.closest(".cb").getAttribute("data-n"), e = S.e[k];
+    if (name === "khbl") { e.kq = t.value; e.khbl = ""; var hit = D.agents.filter(function (a) { return a.m.toLowerCase() === t.value.trim().toLowerCase(); })[0]; if (hit) { e.khbl = hit.m; } }
+    else { e.pq = t.value; e.sp = ""; }
+    openCb(t, t.value); schedAuto(k);
+  }
+  else if (t.id === "in-thung") { S.e[k].thung = t.value; schedAuto(k); }
+  else if (t.id === "ovr") { clearTimeout(S.ot); var v0 = t.value; S.ot = setTimeout(function () { commitOvr(v0); }, 5000); }
+  else if (t.hasAttribute && t.hasAttribute("data-rp")) {
+    if (t.classList.contains("auto")) t.classList.remove("auto");
+    clearTimeout(t._rt); var el = t, forId = S.dd; el._rt = setTimeout(function () { el._saved = el.value; rpSet(el.getAttribute("data-sc"), el.getAttribute("data-rp"), el.value, forId); }, 1200);
+  }
+});
+view.addEventListener("keydown", function (ev) {
+  var t = ev.target, k = curK();
+  if (ev.key === "Escape") { closeCbs(); return; }
+  if (ev.key === "Enter") {
+    if (t.classList && t.classList.contains("cbin")) { var first = t.closest(".cb").querySelector(".op[data-act=pick]"); if (first) { ev.preventDefault(); pick(t.closest(".cb").getAttribute("data-n"), first.getAttribute("data-v")); } }
+    else if (t.id === "in-thung") { ev.preventDefault(); S.e[k].thung = t.value; addEntry(k); }
+    else if (t.id === "et") { ev.preventDefault(); saveEdit(); }
+    else if (t.id === "ovr" || (t.tagName === "INPUT" && t.hasAttribute("data-rp"))) { ev.preventDefault(); t.blur(); }
+  }
+});
+view.addEventListener("change", function (ev) {
+  var t = ev.target, k = curK();
+  if (t.id === "ed") { if (t.value && t.value.slice(0, 7) === MONTH) { S.e[k].date = t.value; document.getElementById("hint").innerHTML = hintHtml(k); } }
+  else if (t.id === "dd") { setDD(t.value); }
+  else if (t.id === "ovr") { clearTimeout(S.ot); commitOvr(t.value); }
+  else if (t.hasAttribute && t.hasAttribute("data-rp")) { clearTimeout(t._rt); if (t._saved !== t.value) rpSet(t.getAttribute("data-sc"), t.getAttribute("data-rp"), t.value); }
+  else if (t.id === "sc") { S.scope = t.value; render(); }
+  else if (t.id === "ps") { S.psrc = t.value; render(); }
+  else if (t.getAttribute("data-act") === "route") {
+    var m = t.getAttribute("data-m"), dv = t.value;
+    S.route[m] = dv || "none"; lsSet("route", S.route);
+    softRender();
+    if (DB) { DB.collection("route").doc(m).set({ day: dv || "none" }).catch(function () { toast("Chưa lưu được lịch"); }); }
+  }
+});
+view.addEventListener("focusout", function () { if (S.defer) { setTimeout(function () { var el = document.activeElement; if (!(el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName) && view.contains(el))) { S.defer = false; render(); } }, 60); } });
+document.addEventListener("click", function (ev) { if (!ev.target.closest(".cb")) closeCbs(); });
+
+rebuildAct(); render();
+
+(async function () {
+  try { DB = window.claude ? await window.claude.use("db") : null; } catch (e) { DB = null; }
+  if (!DB && !window.claude && window.FB_CONFIG && window.FB_CONFIG.apiKey) {
+    try {
+      var ld = function (src) { return new Promise(function (ok, no) { var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); };
+      await ld("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+      await ld("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js");
+      window.firebase.initializeApp(window.FB_CONFIG); DB = window.firebase.firestore();
+    } catch (e) { DB = null; }
+  }
+  if (!DB) { S.dbOk = (window.claude || (window.FB_CONFIG && window.FB_CONFIG.apiKey)) ? false : null; render(); return; }
+  S.dbOk = true;
+  ["th", "kh", "ov", "rp"].forEach(function (name) {
+    DB.collection(name).onSnapshot(function (snap) {
+      var m = {}; snap.docs.forEach(function (d) { var x = d.data(); if (x) m[d.id] = x; });
+      var loc = Object.keys(S[name]);
+      if (!snap.docs.length && loc.length && !S["up_" + name]) {
+        S["up_" + name] = true;
+        var snapLoc = S[name]; loc.forEach(function (id) { DB.collection(name).doc(id).set(snapLoc[id]).catch(function () {}); });
+        return;
+      }
+      S[name] = m; lsSet(name, m); rebuildAct(); softRender();
+    }, function () { S.dbOk = false; softRender(); });
+  });
+  DB.collection("route").onSnapshot(function (snap) {
+    var m = {}; snap.docs.forEach(function (d) { var x = d.data(); if (x && x.day) m[d.id] = x.day; });
+    if (!snap.docs.length && Object.keys(S.route).length && !S.up_route) {
+      S.up_route = true; var snapR = S.route; Object.keys(snapR).forEach(function (id) { DB.collection("route").doc(id).set({ day: snapR[id] }).catch(function () {}); }); return;
+    }
+    S.route = m; lsSet("route", m); softRender();
+  }, function () {});
+  render();
+})();
+})();
+</script>
+
+</body></html>
