@@ -1,0 +1,15 @@
+BÁO CÁO NGÀY - Nguyễn Duy Khánh (SE Tân Châu)
+
+1. Giải nén, tải cả 3 file lên cùng một thư mục trên web cá nhân:
+   - index.html  : trang chính (Kế hoạch / Thực hiện / Báo cáo Ngày)
+   - config.js   : cấu hình đồng bộ (không bắt buộc)
+   - HUONG_DAN.txt
+2. Mở đường link tới index.html là dùng được.
+
+Lưu ý về dữ liệu:
+- Trang đã nối Firebase (dự án t03banhangse): số nhập trên điện thoại và máy tính dùng chung.
+- Lần đầu mở, kế hoạch tháng 10 (357 dòng, 406 thùng) tự được đưa lên Firebase.
+- Cần bật Firestore Database trong Firebase (Build > Firestore Database > Create database).
+- Dòng "Tự động lưu" dưới thẻ ngày cho biết đã lưu. Nếu trang báo chưa nối được kho dữ liệu,
+  số vẫn được lưu tạm trên máy đang dùng.
+- Số đã nhập trên trang Claude không tự chuyển sang trang này.
