@@ -306,6 +306,7 @@ p.rp-note { margin: 0; border-bottom: 0; }
 .xh button{appearance:none;cursor:pointer;font:inherit;font-size:12.5px;border:1px solid var(--accent);color:var(--accent);background:var(--surface);border-radius:5px;padding:3px 8px;white-space:nowrap}
 .xdh{font-weight:700;font-size:13.5px;color:var(--muted);margin:14px 0 6px;display:flex;justify-content:space-between}
 .xmk{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 11px;margin-bottom:6px;display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+.xrt{font-size:11.5px;font-weight:600;margin-top:1px}.xrt.xin{color:#1f8a3b}.xrt.xout{color:#c62828}
 .xnm{font-weight:700;font-size:15px}.xcd{color:var(--muted);font-size:12px}.xhd{grid-column:1/-1}.xsp{grid-column:1/-1;font-size:13px}.xsp span{display:inline-block;background:var(--tint);border-radius:4px;padding:1px 7px;margin:2px 4px 0 0}
 .xst{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;align-self:start;white-space:nowrap}.xst.xok{background:#dff3e2;color:#1f6b33}.xst.xno{background:#fbeee4;color:#9a4a12}
 table.xmt{width:100%;border-collapse:collapse;background:var(--surface);font-size:13.5px}table.xmt th,table.xmt td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}table.xmt td:last-child,table.xmt td:first-child,table.xmt td:nth-child(2){white-space:nowrap}table.xmt th{background:var(--tint)}
@@ -1215,9 +1216,11 @@ MKT.forEach(function (r) { r.tuan = xwk(r.kh); });
 var DNX = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
 function xdmy(s) { return s ? s.slice(8) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4) : ""; }
 function xdn(s) { return DNX[new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)).getDay()]; }
+function xroute(r) { var a = D.agents.filter(function (x) { return x.m === r.m; })[0], d = a ? dayOf(a) : "";
+  return d && d === keyOfDate(r.kh) ? '<div class="xrt xin">đúng tuyến SE</div>' : '<div class="xrt xout">sai tuyến SE</div>'; }
 function xname(m) { var a = D.agents.filter(function (x) { return x.m === m; })[0]; return a ? a.s : ""; }
 function xcard(r) { var nm = xname(r.m);
-  return '<div class="xmk"><div><div class="xnm">' + esc(nm || r.m) + '</div><div class="xcd">' + esc(r.m) + "</div></div>" + (r.th ? '<span class="xst xok">TH ' + xdmy(r.th) + "</span>" : '<span class="xst xno">Chưa thực hiện</span>') +
+  return '<div class="xmk"><div><div class="xnm">' + esc(nm || r.m) + '</div><div class="xcd">' + esc(r.m) + "</div>" + xroute(r) + "</div>" + (r.th ? '<span class="xst xok">TH ' + xdmy(r.th) + "</span>" : '<span class="xst xno">Chưa thực hiện</span>') +
     '<div class="xhd">' + esc(r.hd) + '</div><div class="xsp"><span>SP 01: ' + esc(r.sp1) + "</span>" + (r.sp2 ? "<span>SP 02: " + esc(r.sp2) + "</span>" : "") + "</div></div>"; }
 function xcal() {
   var t = new Date(), td = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate());
@@ -1243,7 +1246,7 @@ function viewMKT() {
   L.forEach(function (r) { if (r.kh !== cur) { cur = r.kh; mob += '<div class="xdh"><span>' + xdn(cur) + ", " + xdmy(cur) + " · " + esc(r.tuan) + "</span><span>" + L.filter(function (x) { return x.kh === cur; }).length + " hoạt động</span></div>"; } mob += xcard(r); });
   mob += "</div>";
   var desk = '<div class="xdesk"><table class="xmt"><thead><tr><th>Ngày kế hoạch</th><th>Ngày thực hiện</th><th>Mã KHBL</th><th>Tên hoạt động</th><th>Sản phẩm tập trung 1</th><th>Sản phẩm tập trung 2</th><th>Tuần</th></tr></thead><tbody>' +
-    L.map(function (r) { return "<tr><td>" + xdmy(r.kh) + "</td><td>" + xdmy(r.th) + "</td><td><b>" + esc(r.m) + '</b><br><span class="m">' + esc(xname(r.m)) + "</span></td><td>" + esc(r.hd) + "</td><td>" + esc(r.sp1) + "</td><td>" + esc(r.sp2) + "</td><td>" + esc(r.tuan) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    L.map(function (r) { return "<tr><td>" + xdmy(r.kh) + "</td><td>" + xdmy(r.th) + "</td><td><b>" + esc(r.m) + '</b><br><span class="m">' + esc(xname(r.m)) + "</span>" + xroute(r) + "</td><td>" + esc(r.hd) + "</td><td>" + esc(r.sp1) + "</td><td>" + esc(r.sp2) + "</td><td>" + esc(r.tuan) + "</td></tr>"; }).join("") + "</tbody></table></div>";
   return h + mob + desk;
 }
 document.getElementById("view").addEventListener("click", function (ev) {
