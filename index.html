@@ -393,7 +393,8 @@ function wkNums(m, w) {
   ACT.forEach(function (e) { if (e.khbl === m && e.w === w) tt += e.thung; });
   return { kt: kt, tt: tt };
 }
-function focusEl(id) { setTimeout(function () { var x = document.getElementById(id); if (x) x.focus(); }, 0); }
+var TOUCH = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+function focusEl(id) { if (TOUCH && (id === "in-sp" || id === "in-khbl")) return; setTimeout(function () { var x = document.getElementById(id); if (x) x.focus(); }, 0); }
 
 /* ---------- Kế hoạch tháng (theo file) ---------- */
 function viewKHMonth() {
@@ -1272,8 +1273,12 @@ view.addEventListener("click", function (ev) {
 });
 view.addEventListener("focusin", function (ev) {
   var t = ev.target;
-  if (t.classList && t.classList.contains("cbin")) { openCb(t, ""); t.select(); }
+  if (t.classList && t.classList.contains("cbin")) { closeCbs(); t.select(); }
   else if (!t.closest(".cb")) closeCbs();
+});
+view.addEventListener("click", function (ev) {
+  var t = ev.target;
+  if (t.classList && t.classList.contains("cbin")) { if (t.getAttribute("aria-expanded") !== "true") { openCb(t, ""); t.select(); } }
 });
 view.addEventListener("input", function (ev) {
   var t = ev.target, k = curK();
@@ -1294,6 +1299,7 @@ view.addEventListener("input", function (ev) {
 view.addEventListener("keydown", function (ev) {
   var t = ev.target, k = curK();
   if (ev.key === "Escape") { closeCbs(); return; }
+  if (ev.key === "ArrowDown" && t.classList && t.classList.contains("cbin") && t.getAttribute("aria-expanded") !== "true") { ev.preventDefault(); openCb(t, ""); return; }
   if (ev.key === "Enter") {
     if (t.classList && t.classList.contains("cbin")) { var first = t.closest(".cb").querySelector(".op[data-act=pick]"); if (first) { ev.preventDefault(); pick(t.closest(".cb").getAttribute("data-n"), first.getAttribute("data-v")); } }
     else if (t.id === "in-thung") { ev.preventDefault(); S.e[k].thung = t.value; addEntry(k); }
