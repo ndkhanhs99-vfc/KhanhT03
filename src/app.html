@@ -274,6 +274,16 @@ p.rp-note { margin: 0; border-bottom: 0; }
 .c2pop .acts2 { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 .c2pop .acts2 a { text-decoration: none; font-weight: 700; font-size: 12.5px; padding: 5px 9px; border-radius: 5px; background: #1e5c4a; color: #fff; }
 .c2pop .acts2 a.g { background: #fff; color: #1e5c4a; border: 1px solid #1e5c4a; }
+.c2pop .kh2 { margin-top: 8px; padding-top: 8px; border-top: 1px solid #cfdcd3; }
+.c2pop .khh { font-size: 13px; }
+.c2pop .khl { max-height: 190px; overflow-y: auto; margin-top: 6px; display: flex; flex-direction: column; gap: 6px; padding-right: 2px; }
+.c2pop .khd { border: 1px solid #cfdcd3; border-radius: 5px; padding: 4px 7px; }
+.c2pop .khd.ps { opacity: .55; }
+.c2pop .khd.nx { border-color: #1e5c4a; background: #e0eee8; }
+.c2pop .khdt { font-weight: 700; font-size: 12px; color: #1e5c4a; }
+.c2pop .khdt .tag { background: #1e5c4a; color: #fff; border-radius: 3px; padding: 0 5px; font-size: 10.5px; margin-left: 4px; }
+.c2pop .khr { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+.c2pop .khr b { white-space: nowrap; }
 .leaflet-tooltip.c2lbl { background: rgba(255,255,255,.94); border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.35); font: 600 11.5px "Be Vietnam Pro", system-ui, sans-serif; padding: 1px 6px; color: #14241b; }
 .leaflet-tooltip-top.c2lbl::before { border-top-color: rgba(255,255,255,.94); }
 @media (max-width: 560px) { #map { height: calc(100vh - 270px); } }
@@ -1080,12 +1090,29 @@ function mapBar() {
   h += '<button class="mapbtn" data-mact="today">Tuyến hôm nay</button><button class="mapbtn" data-mact="all">Tất cả</button><button class="mapbtn" data-mact="me">📍 Vị trí của tôi</button>';
   return h;
 }
+function planHtml(a) {
+  var td = todayStr(), byDay = {}, kt = 0, kv = 0, tt = 0, tv = 0;
+  Object.keys(S.kh).forEach(function (id) { var e = S.kh[id]; if (e.khbl !== a.m) return; var n = +e.thung || 0; (byDay[e.date] = byDay[e.date] || []).push(e); kt += n; kv += n * priceOf(e.sp); });
+  Object.keys(S.th).forEach(function (id) { var e = S.th[id]; if (e.khbl !== a.m) return; var n = +e.thung || 0; tt += n; tv += n * priceOf(e.sp); });
+  var days = Object.keys(byDay).sort(), next = days.filter(function (d) { return d >= td; })[0];
+  var pc = kv > 0 ? Math.round(tv / kv * 100) : null;
+  var h = '<div class="kh2"><div class="khh">Kế hoạch tháng ' + M + ": <b>" + fmt(kt) + " thùng</b> · " + tr(kv) + " tr</div>" +
+    '<div class="m">Đã bán: ' + fmt(tt) + " thùng · " + tr(tv) + " tr" + (pc == null ? "" : " (" + pc + "%)") + "</div>";
+  if (!days.length) return h + '<div class="m">Chưa có dòng kế hoạch nào ở tab Kế hoạch.</div></div>';
+  h += '<div class="khl">' + days.map(function (d) {
+    var rows = byDay[d].slice().sort(function (x, y) { return (P[x.sp] ? P[x.sp].n : x.sp) < (P[y.sp] ? P[y.sp].n : y.sp) ? -1 : 1; });
+    var cls = d === next ? "nx" : d < td ? "ps" : "";
+    return '<div class="khd ' + cls + '"><div class="khdt">' + dayLabel(d) + " " + dmy(d) + (d === next ? ' <span class="tag">Lần ghé tới</span>' : "") + "</div>" +
+      rows.map(function (e) { return '<div class="khr"><span>' + esc(P[e.sp] ? P[e.sp].n : e.sp) + "</span><b>" + fmt(+e.thung || 0) + " th</b></div>"; }).join("") + "</div>";
+  }).join("") + "</div></div>";
+  return h;
+}
 function popHtml(a) {
   var p = C2LOC[a.m], d = dayOf(a);
   return '<div class="c2pop"><b>' + esc(a.s) + '</b><div class="m">' + esc(a.m) + (d ? " · " + DAYNAME[d] : "") + " · NPP " + esc(a.n) + "</div>" +
     "<div>" + esc(p.dc || (a.ap + ", " + a.x)) + "</div>" +
     "<div>" + esc(a.dd) + (a.sdt ? ' · <a href="tel:' + esc(a.sdt) + '">' + esc(a.sdt) + "</a>" : "") + "</div>" +
-    '<div class="m">' + p.lat.toFixed(6) + ", " + p.lng.toFixed(6) + "</div>" +
+    '<div class="m">' + p.lat.toFixed(6) + ", " + p.lng.toFixed(6) + "</div>" + planHtml(a) +
     '<div class="acts2"><a href="' + gdir(p) + '" target="_blank" rel="noopener">Chỉ đường</a><a class="g" href="' + gmaps(p) + '" target="_blank" rel="noopener">Mở Google Maps</a><a class="g" href="#" data-goth="' + esc(a.m) + '">Nhập TH</a></div></div>';
 }
 function mkTip(mk, txt, perm) { mk.unbindTooltip(); mk.bindTooltip(txt, { direction: "top", offset: [0, -9], className: "c2lbl", permanent: perm }); }
@@ -1096,7 +1123,7 @@ function drawMarkers(fit) {
   D.agents.forEach(function (a) {
     var p = C2LOC[a.m], d = dayOf(a); if (!p || !MAPDAY[d]) return;
     var mk = L.circleMarker([p.lat, p.lng], { radius: 9, color: "#ffffff", weight: 2.5, fillColor: DAYCOL[d] || "#555555", fillOpacity: 0.95 });
-    mk.bindPopup(popHtml(a), { maxWidth: 280 }); mkTip(mk, a.s, perm);
+    mk.bindPopup(function () { return popHtml(a); }, { maxWidth: 300, minWidth: 240, autoPanPadding: [16, 16] }); mkTip(mk, a.s, perm);
     mk.addTo(MAP); MAPL[a.m] = mk; pts.push([p.lat, p.lng]);
   });
   if (fit && pts.length) MAP.fitBounds(pts, { padding: [30, 30], maxZoom: 15 });
