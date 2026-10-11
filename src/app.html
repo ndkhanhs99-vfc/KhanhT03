@@ -1086,7 +1086,7 @@ function gmaps(p) { return "https://www.google.com/maps/search/?api=1&query=" + 
 function gdir(p) { return "https://www.google.com/maps/dir/?api=1&destination=" + p.lat + "," + p.lng; }
 function mapBar() {
   var cnt = {}; D.agents.forEach(function (a) { var d = dayOf(a); if (C2LOC[a.m]) cnt[d] = (cnt[d] || 0) + 1; });
-  var h = DAYS.map(function (d) { return '<button class="dchip" data-day="' + d + '" aria-pressed="' + !!MAPDAY[d] + '"><i style="background:' + DAYCOL[d] + '"></i>' + DAYNAME[d] + " (" + (cnt[d] || 0) + ")</button>"; }).join("");
+  var h = DAYS.map(function (d) { return '<button class="dchip" data-day="' + d + '" aria-pressed="' + !!MAPDAY[d] + '"><i style="background:' + DAYCOL[d] + '"></i>' + DAYNAME[d] + " (" + (cnt[d] || 0) + " đại lí)</button>"; }).join("");
   h += '<button class="mapbtn" data-mact="today">Tuyến hôm nay</button><button class="mapbtn" data-mact="all">Tất cả</button><button class="mapbtn" data-mact="me">📍 Vị trí của tôi</button>';
   return h;
 }
@@ -1113,7 +1113,7 @@ function popHtml(a) {
     "<div>" + esc(p.dc || (a.ap + ", " + a.x)) + "</div>" +
     "<div>" + esc(a.dd) + (a.sdt ? ' · <a href="tel:' + esc(a.sdt) + '">' + esc(a.sdt) + "</a>" : "") + "</div>" +
     '<div class="m">' + p.lat.toFixed(6) + ", " + p.lng.toFixed(6) + "</div>" + planHtml(a) +
-    '<div class="acts2"><a href="' + gdir(p) + '" target="_blank" rel="noopener">Chỉ đường</a><a class="g" href="' + gmaps(p) + '" target="_blank" rel="noopener">Mở Google Maps</a><a class="g" href="#" data-goth="' + esc(a.m) + '">Nhập TH</a></div></div>';
+    '<div class="acts2"><a href="' + gdir(p) + '" target="_blank" rel="noopener">Chỉ đường</a><a class="g" href="' + gmaps(p) + '" target="_blank" rel="noopener">Mở Google Maps</a></div></div>';
 }
 function mkTip(mk, txt, perm) { mk.unbindTooltip(); mk.bindTooltip(txt, { direction: "top", offset: [0, -9], className: "c2lbl", permanent: perm }); }
 function drawMarkers(fit) {
