@@ -1087,12 +1087,21 @@ function mapBar() {
   h += '<button class="mapbtn" data-mact="today">Tuyến hôm nay</button><button class="mapbtn" data-mact="all">Tất cả</button><button class="mapbtn" data-mact="me">📍 Vị trí của tôi</button>';
   return h;
 }
+function planDate(a) {
+  var d = dayOf(a), t = todayStr(), ds = {};
+  for (var i = 1; i <= LAST; i++) { var x = MONTH + "-" + pad(i); if (d && keyOfDate(x) === d) ds[x] = 1; }
+  Object.keys(S.kh).forEach(function (id) { var e = S.kh[id]; if (e.khbl === a.m && e.date) ds[e.date] = 1; });
+  var l = Object.keys(ds).sort(); if (!l.length) return "";
+  for (var j = 0; j < l.length; j++) if (l[j] >= t) return l[j];
+  return l[l.length - 1];
+}
 function planHtml(a) {
-  var bySp = {}, kt = 0, kv = 0;
-  Object.keys(S.kh).forEach(function (id) { var e = S.kh[id]; if (e.khbl !== a.m) return; var n = +e.thung || 0; bySp[e.sp] = (bySp[e.sp] || 0) + n; kt += n; kv += n * priceOf(e.sp); });
+  var dt = planDate(a), bySp = {}, kt = 0, kv = 0;
+  var h = '<div class="kh2"><div class="khh">Kế hoạch ' + (dt ? DAYNAME[keyOfDate(dt)] + ", " + dt.slice(8, 10) + "/" + dt.slice(5, 7) : "trong ngày") + "</div>";
+  if (!dt) return h + '<div class="m">Đại lí chưa có tuyến.</div></div>';
+  Object.keys(S.kh).forEach(function (id) { var e = S.kh[id]; if (e.khbl !== a.m || e.date !== dt) return; var n = +e.thung || 0; bySp[e.sp] = (bySp[e.sp] || 0) + n; kt += n; kv += n * priceOf(e.sp); });
   var sps = Object.keys(bySp).sort(function (x, y) { return (P[x] ? P[x].n : x) < (P[y] ? P[y].n : y) ? -1 : 1; });
-  var h = '<div class="kh2"><div class="khh">Kế hoạch tháng ' + M + "</div>";
-  if (!sps.length) return h + '<div class="m">Chưa có kế hoạch ở tab Kế hoạch.</div></div>';
+  if (!sps.length) return h + '<div class="m">Chưa lên kế hoạch cho ngày này ở tab Kế hoạch.</div></div>';
   h += '<table class="kht"><thead><tr><th>Sản phẩm</th><th>Thùng</th><th>Doanh số (đ)</th></tr></thead><tbody>' +
     sps.map(function (sp) { var n = bySp[sp]; return "<tr><td>" + esc(P[sp] ? P[sp].n : sp) + "</td><td>" + fmt(n) + "</td><td>" + nf0.format(n * priceOf(sp)) + "</td></tr>"; }).join("") +
     '</tbody><tfoot><tr><td>Tổng</td><td>' + fmt(kt) + "</td><td>" + nf0.format(kv) + "</td></tr></tfoot></table></div>";
