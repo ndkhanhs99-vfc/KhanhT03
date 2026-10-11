@@ -363,7 +363,7 @@ function dayLabel(ds) { var k = keyOfDate(ds); return k ? DAYNAME[k] : "Chủ nh
 function newE(d) { return { date: d, khbl: "", kq: "", sp: "", pq: "", thung: "" }; }
 var T0 = todayStr();
 var S = { tab: "kh", khview: "nhap", kmode: "agent", unit: "thung", q: "", open: {}, kh: {}, th: {}, route: {}, scope: "all", psrc: "file", dd: T0, dp: false, e: { kh: newE(T0), th: newE(T0) }, edit: null, delId: "", dbOk: null, defer: false, ld: "", confReset: false };
-try { var st = localStorage.getItem("sdsse_tab"); if (st) S.tab = st; } catch (e) {}
+S.tab = "kh"; /* luôn mở ở tab Kế hoạch */
 var DB = null, ACT = [], ACTK = [], LASTREP = null;
 try { S.lastSave = +localStorage.getItem("sdsse_last") || 0; } catch (e) { S.lastSave = 0; }
 function lsGet(n) { try { var v = localStorage.getItem("sdsse_" + n); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
