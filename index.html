@@ -1234,7 +1234,7 @@ function viewMKT() {
   var h = '<div class="xtop"><div class="xsum"><div><b>' + MKT.length + "</b>KH số lượng</div><div><b>" + done + "</b>Thực hiện</div><div><b>" + (MKT.length - done) + "</b>Chưa thực hiện</div></div>" + xcal() + "</div>";
   if (MKS.sel) { var rs = MKT.filter(function (r) { return r.kh === MKS.sel; });
     h += '<div class="xdayp"><div class="xh"><span>' + xdn(MKS.sel) + ", " + xdmy(MKS.sel) + " · " + rs.length + ' hoạt động</span><button data-xx="1">Xem cả tháng</button></div>' + (rs.length ? rs.map(xcard).join("") : '<div class="m">Không có hoạt động MKT ngày này.</div>') + "</div>"; }
-  var F = [["all", "Tất cả"], ["Tuần 1", "Tuần 1 (1–4)"], ["Tuần 2", "Tuần 2 (5–11)"], ["Tuần 3", "Tuần 3 (12–18)"], ["Tuần 4", "Tuần 4 (19–25)"], ["no", "Chưa thực hiện"], ["ok", "Đã thực hiện"]];
+  var F = [["all", "Tất cả"], ["Tuần 1", "Tuần 1 (1–4)"], ["Tuần 2", "Tuần 2 (5–11)"], ["Tuần 3", "Tuần 3 (12–18)"], ["Tuần 4", "Tuần 4 (19–25)"], ["Tuần 5", "Tuần 5 (26–31)"], ["no", "Chưa thực hiện"], ["ok", "Đã thực hiện"]];
   h += '<div class="xchips">' + F.map(function (f) { return '<button class="xchip' + (MKS.f === f[0] ? " xon" : "") + '" data-xf="' + f[0] + '">' + f[1] + "</button>"; }).join("") + "</div>";
   var L = MKT.filter(function (r) { var f = MKS.f; return f === "all" || (f === "no" ? !r.th : f === "ok" ? !!r.th : r.tuan === f); });
   if (XWR[MKS.f]) h += '<div class="xdh" style="margin-top:10px;color:var(--fg)"><span>' + MKS.f + " · " + XWR[MKS.f] + "</span><span>" + L.length + " hoạt động</span></div>";
