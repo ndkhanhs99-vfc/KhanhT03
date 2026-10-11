@@ -275,15 +275,12 @@ p.rp-note { margin: 0; border-bottom: 0; }
 .c2pop .acts2 a { text-decoration: none; font-weight: 700; font-size: 12.5px; padding: 5px 9px; border-radius: 5px; background: #1e5c4a; color: #fff; }
 .c2pop .acts2 a.g { background: #fff; color: #1e5c4a; border: 1px solid #1e5c4a; }
 .c2pop .kh2 { margin-top: 8px; padding-top: 8px; border-top: 1px solid #cfdcd3; }
-.c2pop .khh { font-size: 13px; }
-.c2pop .khl { max-height: 190px; overflow-y: auto; margin-top: 6px; display: flex; flex-direction: column; gap: 6px; padding-right: 2px; }
-.c2pop .khd { border: 1px solid #cfdcd3; border-radius: 5px; padding: 4px 7px; }
-.c2pop .khd.ps { opacity: .55; }
-.c2pop .khd.nx { border-color: #1e5c4a; background: #e0eee8; }
-.c2pop .khdt { font-weight: 700; font-size: 12px; color: #1e5c4a; }
-.c2pop .khdt .tag { background: #1e5c4a; color: #fff; border-radius: 3px; padding: 0 5px; font-size: 10.5px; margin-left: 4px; }
-.c2pop .khr { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; }
-.c2pop .khr b { white-space: nowrap; }
+.c2pop .khh { font-weight: 700; color: #1e5c4a; font-size: 13px; margin-bottom: 4px; }
+.c2pop .kht { width: 100%; min-width: 0; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.c2pop .kht th, .c2pop .kht td { padding: 3px 4px; border-bottom: 1px solid #e3ebe6; text-align: right; white-space: nowrap; position: static; min-width: 0; max-width: none; background: none; }
+.c2pop .kht th:first-child, .c2pop .kht td:first-child { text-align: left; white-space: normal; }
+.c2pop .kht th { font-size: 11px; color: #55655a; text-transform: none; letter-spacing: 0; font-weight: 600; }
+.c2pop .kht tfoot td { font-weight: 700; border-top: 2px solid #1e5c4a; border-bottom: 0; }
 .leaflet-tooltip.c2lbl { background: rgba(255,255,255,.94); border: 0; box-shadow: 0 1px 3px rgba(0,0,0,.35); font: 600 11.5px "Be Vietnam Pro", system-ui, sans-serif; padding: 1px 6px; color: #14241b; }
 .leaflet-tooltip-top.c2lbl::before { border-top-color: rgba(255,255,255,.94); }
 @media (max-width: 560px) { #map { height: calc(100vh - 270px); } }
@@ -1095,20 +1092,14 @@ function mapBar() {
   return h;
 }
 function planHtml(a) {
-  var td = todayStr(), byDay = {}, kt = 0, kv = 0, tt = 0, tv = 0;
-  Object.keys(S.kh).forEach(function (id) { var e = S.kh[id]; if (e.khbl !== a.m) return; var n = +e.thung || 0; (byDay[e.date] = byDay[e.date] || []).push(e); kt += n; kv += n * priceOf(e.sp); });
-  Object.keys(S.th).forEach(function (id) { var e = S.th[id]; if (e.khbl !== a.m) return; var n = +e.thung || 0; tt += n; tv += n * priceOf(e.sp); });
-  var days = Object.keys(byDay).sort(), next = days.filter(function (d) { return d >= td; })[0];
-  var pc = kv > 0 ? Math.round(tv / kv * 100) : null;
-  var h = '<div class="kh2"><div class="khh">Kế hoạch tháng ' + M + ": <b>" + fmt(kt) + " thùng</b> · " + tr(kv) + " tr</div>" +
-    '<div class="m">Đã bán: ' + fmt(tt) + " thùng · " + tr(tv) + " tr" + (pc == null ? "" : " (" + pc + "%)") + "</div>";
-  if (!days.length) return h + '<div class="m">Chưa có dòng kế hoạch nào ở tab Kế hoạch.</div></div>';
-  h += '<div class="khl">' + days.map(function (d) {
-    var rows = byDay[d].slice().sort(function (x, y) { return (P[x.sp] ? P[x.sp].n : x.sp) < (P[y.sp] ? P[y.sp].n : y.sp) ? -1 : 1; });
-    var cls = d === next ? "nx" : d < td ? "ps" : "";
-    return '<div class="khd ' + cls + '"><div class="khdt">' + dayLabel(d) + " " + dmy(d) + (d === next ? ' <span class="tag">Lần ghé tới</span>' : "") + "</div>" +
-      rows.map(function (e) { return '<div class="khr"><span>' + esc(P[e.sp] ? P[e.sp].n : e.sp) + "</span><b>" + fmt(+e.thung || 0) + " th</b></div>"; }).join("") + "</div>";
-  }).join("") + "</div></div>";
+  var bySp = {}, kt = 0, kv = 0;
+  Object.keys(S.kh).forEach(function (id) { var e = S.kh[id]; if (e.khbl !== a.m) return; var n = +e.thung || 0; bySp[e.sp] = (bySp[e.sp] || 0) + n; kt += n; kv += n * priceOf(e.sp); });
+  var sps = Object.keys(bySp).sort(function (x, y) { return (P[x] ? P[x].n : x) < (P[y] ? P[y].n : y) ? -1 : 1; });
+  var h = '<div class="kh2"><div class="khh">Kế hoạch tháng ' + M + "</div>";
+  if (!sps.length) return h + '<div class="m">Chưa có kế hoạch ở tab Kế hoạch.</div></div>';
+  h += '<table class="kht"><thead><tr><th>Sản phẩm</th><th>Thùng</th><th>Doanh số (đ)</th></tr></thead><tbody>' +
+    sps.map(function (sp) { var n = bySp[sp]; return "<tr><td>" + esc(P[sp] ? P[sp].n : sp) + "</td><td>" + fmt(n) + "</td><td>" + nf0.format(n * priceOf(sp)) + "</td></tr>"; }).join("") +
+    '</tbody><tfoot><tr><td>Tổng</td><td>' + fmt(kt) + "</td><td>" + nf0.format(kv) + "</td></tr></tfoot></table></div>";
   return h;
 }
 function popHtml(a) {
