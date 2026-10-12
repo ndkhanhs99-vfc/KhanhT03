@@ -13,6 +13,7 @@ rep('S.kh = lsGet("kh");',
     'var W4SPLIT = ' + json.dumps(w4, separators=(",", ":")) + ';\n'
     'var TH_SEED = ' + json.dumps(th, ensure_ascii=False, separators=(",", ":")) + ';\n'
     'var KH_SEED = ' + json.dumps(kh, ensure_ascii=False, separators=(",", ":")) + ';\n'
+    'var KH_OLD = ' + rd("src/kh_old.json") + ';\n'
     'S.kh = lsGet("kh"); if (!window.claude && !Object.keys(S.kh).length) { try { if (!localStorage.getItem("sdsse_seeded")) { S.kh = KH_SEED; lsSet("kh", S.kh); localStorage.setItem("sdsse_seeded", "1"); } } catch (e) { S.kh = KH_SEED; } }')
 rep('<script>\n(function () {', '<script src="config.js"></script>\n<script>\nwindow.__startApp = function () {')
 i = s.rindex('})();\n</script>'); s = s[:i] + '};\n</script>\n' + rd("src/gate_block.html") + s[i + len('})();\n</script>'):]

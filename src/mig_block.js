@@ -38,5 +38,31 @@
         if (d3.exists) { var o3 = Object.assign({}, d3.data()); ["xantocin", "tora", "delfan"].forEach(function (k) { ["t", "k", "nn", "gp"].forEach(function (f) { delete o3["p_" + k + "_" + f]; }); }); await r3.set(o3); }
         await meta.set({ rp1012c: true }, { merge: true });
       }
+      if (!md.kh3) {
+        /* Lên lại kế hoạch theo quy ước tuần mới: T2 12–18, T3 19–25, T4 26–31; mỗi tuần đặt vào ngày đi tuyến của đại lí (tuyến lấy cả phần anh đã đổi trên web).
+           Dòng kế hoạch anh tự thêm/sửa (khác bản tự động cũ) được giữ nguyên. Ngày 8–11 (nay thuộc tuần 1) bỏ kế hoạch tuần 2 cũ, nhưng giữ target sell-out đã có trong báo cáo các ngày đó. */
+        var rs3 = await DB.collection("route").get(), RT3 = {}; rs3.docs.forEach(function (d) { var x = d.data(); if (x && x.day) RT3[d.id] = x.day; });
+        var RNG3 = { 2: [12, 18], 3: [19, 25], 4: [26, LAST] }, want3 = {}, now3 = Date.now();
+        D.agents.forEach(function (a) {
+          var rd = RT3[a.m] ? (RT3[a.m] === "none" ? "" : RT3[a.m]) : (a.d || ""); if (!rd) return;
+          [2, 3, 4].forEach(function (w) {
+            var dt = ""; for (var d = RNG3[w][0]; d <= RNG3[w][1]; d++) { var ds = MONTH + "-" + pad(d); if (keyOfDate(ds) === rd) { dt = ds; break; } }
+            if (!dt) return;
+            (PL[a.m] || []).forEach(function (l) { var q = l[4 + w]; if (q > 0) want3[docId(dt, a.m, l[1])] = { date: dt, khbl: a.m, sp: l[1], thung: q, ts: now3++ }; });
+          });
+        });
+        var all3 = await DB.collection("kh").get(), auto3 = {}, man3 = {}, oldSell = {};
+        all3.docs.forEach(function (d) {
+          var x = d.data(); if (!x || !x.date || x.date < MONTH + "-08") return;
+          var o = KH_OLD[d.id]; if (o && o.date === x.date && +o.thung === +x.thung) auto3[d.id] = x; else man3[d.id] = 1;
+          if (x.date <= MONTH + "-11") oldSell[x.date] = (oldSell[x.date] || 0) + (+x.thung || 0) * priceOf(x.sp);
+        });
+        for (var od in oldSell) { var rr3 = DB.collection("rp").doc(od), rg3 = await rr3.get(), cd3 = (rg3.exists && rg3.data()) || {}; if (cd3.tg_sell === undefined || cd3.tg_sell === "") await rr3.set({ tg_sell: String(Math.round(oldSell[od])) }, { merge: true }); }
+        var ops3 = [];
+        Object.keys(auto3).forEach(function (id) { if (!want3[id]) ops3.push(DB.collection("kh").doc(id).delete()); });
+        Object.keys(want3).forEach(function (id) { if (!man3[id]) ops3.push(DB.collection("kh").doc(id).set(want3[id])); });
+        await Promise.all(ops3);
+        await meta.set({ kh3: true }, { merge: true });
+      }
     } catch (e) {}
   })();
