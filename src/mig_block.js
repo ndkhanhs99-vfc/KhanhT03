@@ -19,5 +19,13 @@
         await meta.set({ w4split: true }, { merge: true });
       }
       if (!md.th) { await fill("th", TH_SEED); await meta.set({ th: true }, { merge: true }); }
+      if (!md.kq1012) {
+        /* Kết quả sản phẩm lũy kế đến 12/10 anh Khánh đưa (lít/kg); bỏ qua ô anh đã tự nhập */
+        var KQ = { amistar: "120", anvil: "144", incipio: "8", blastogan: "15", pexena: "2", ridomil: "20" };
+        var rr = DB.collection("rp").doc("2026-10-12"), rd = await rr.get(), cur = (rd.exists && rd.data()) || {}, add = {};
+        Object.keys(KQ).forEach(function (k) { var f = "p_" + k + "_k"; if (cur[f] === undefined || cur[f] === "") add[f] = KQ[k]; });
+        if (Object.keys(add).length) await rr.set(add, { merge: true });
+        await meta.set({ kq1012: true }, { merge: true });
+      }
     } catch (e) {}
   })();
