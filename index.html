@@ -667,6 +667,7 @@ function carry(dd, k) {
   for (var i = 0; i < ds.length; i++) { var v = S.rp[ds[i]][k]; if (v !== undefined) return v; }
   return "";
 }
+var KQSP0 = "2026-10-12"; /* ngày bắt đầu cộng dồn kết quả sản phẩm */
 function buildRep(dd) {
   var day = rpDoc(dd), tk = keyOfDate(dd), ag = agentsOn(tk), wk = weekOf(dd);
   function vol(sp) { var p = P[sp]; return p && p.q ? p.q : 0; }
@@ -682,6 +683,21 @@ function buildRep(dd) {
     var v = e.thung * priceOf(e.sp); kLk += v; act[e.khbl] = 1;
     if (e.date === dd) { kSell += v; gd[e.khbl] = 1; var k = keyOf(e.sp); kP[k] = (kP[k] || 0) + e.thung * vol(e.sp); }
   });
+  // Kết quả sản phẩm cộng dồn từ ngày KQSP0: mỗi ngày = kết quả ngày trước (kể cả số anh sửa tay) + thực hiện trong ngày
+  var cum = null;
+  if (dd >= KQSP0) {
+    var dkp = {};
+    ACT.forEach(function (e) { if (e.date < KQSP0 || e.date > dd) return; var k = keyOf(e.sp); (dkp[e.date] = dkp[e.date] || {})[k] = (dkp[e.date][k] || 0) + e.thung * vol(e.sp); });
+    var run = {}, auto = {}, x = KQSP0;
+    while (x <= dd) {
+      var dk = dkp[x] || {}, doc = rpDoc(x), ks = {};
+      Object.keys(run).concat(Object.keys(dk)).forEach(function (k) { ks[k] = 1; });
+      Object.keys(doc).forEach(function (f) { var m = /^p_(.+)_k$/.exec(f); if (m) ks[m[1]] = 1; });
+      Object.keys(ks).forEach(function (k) { var a = (run[k] || 0) + (dk[k] || 0); if (x === dd) auto[k] = a; run[k] = has(doc["p_" + k + "_k"]) ? numv(doc["p_" + k + "_k"]) : a; });
+      var nx = new Date(+x.slice(0, 4), +x.slice(5, 7) - 1, +x.slice(8, 10) + 1); x = nx.getFullYear() + "-" + pad(nx.getMonth() + 1) + "-" + pad(nx.getDate());
+    }
+    cum = auto;
+  }
   var ft = fileTot();
   function ov(k, auto) { return has(day[k]) ? numv(day[k]) : auto; }
   function mv(k) { return has(day[k]) ? numv(day[k]) : null; }
@@ -701,8 +717,8 @@ function buildRep(dd) {
     { g: "", l: "Số ND đã chuyển đổi mua hàng", u: "ND", tg: mv("tg_ndcd"), tk: "tg_ndcd", kq: mv("kq_ndcd"), kk: "kq_ndcd" }
   ];
   function prow(key, n, u, dt0, gia0) {
-    var pk = "p_" + key + "_", ta = MT[key] || 0;
-    return { key: key, n: n, u: u, ta: ta, tg: has(day[pk + "t"]) ? numv(day[pk + "t"]) : ta, kqa: kP[key] || 0, kqo: has(day[pk + "k"]), kq: has(day[pk + "k"]) ? numv(day[pk + "k"]) : (kP[key] || 0),
+    var pk = "p_" + key + "_", ta = MT[key] || 0, kAuto = cum ? (cum[key] || 0) : (kP[key] || 0);
+    return { key: key, n: n, u: u, ta: ta, tg: has(day[pk + "t"]) ? numv(day[pk + "t"]) : ta, kqa: kAuto, kqo: has(day[pk + "k"]), kq: has(day[pk + "k"]) ? numv(day[pk + "k"]) : kAuto,
       nn: day[pk + "nn"] !== undefined ? day[pk + "nn"] : carry(dd, pk + "nn"), gp: day[pk + "gp"] !== undefined ? day[pk + "gp"] : carry(dd, pk + "gp"),
       dt: cfgv("dt_" + key, dt0), gia: cfgv("gia_" + key, gia0) };
   }
@@ -711,7 +727,7 @@ function buildRep(dd) {
     prod.push({ grp: g[0] });
     g[1].forEach(function (p) { prod.push(prow(p[0], p[1], p[2], p[4], p[5])); });
     if (g[2]) {
-      var others = {}; Object.keys(kP).forEach(function (k) { if (k.slice(0, 2) === "o:" && kP[k] > 0) others[k] = 1; });
+      var others = {}, src2 = cum || kP; Object.keys(src2).forEach(function (k) { if (k.slice(0, 2) === "o:" && src2[k] > 0) others[k] = 1; });
       Object.keys(day).forEach(function (f) { var m = /^p_(o:.+)_k$/.exec(f); if (m && has(day[f])) others[m[1]] = 1; });
       Object.keys(others).sort().forEach(function (k) { var nm = k.slice(2); prod.push(prow(k, nm, unitOfName(nm + " " + ((D.catalog.filter(function (c) { return c.gr === nm; })[0] || {}).n || "")), "", "")); });
     }
@@ -747,7 +763,7 @@ function viewDaily() {
     h += "<tr>" + (r.g ? '<td class="lb2">' + r.g + "</td>" : "<td></td>") + "<td>" + r.l + '</td><td class="c">' + r.u + '</td><td class="num">' + tgC + '</td><td class="num">' + kqC + '</td><td class="num">' + pS(r.kq, r.tg) + '</td><td class="num">' + diffS(r) + "</td></tr>";
   });
   h += "</tbody></table></div>";
-  h += '<p class="rp-note">Target sell-out ngày ' + (R.src === "day" ? "lấy từ kế hoạch ngày ở tab Kế hoạch." : "lấy từ kế hoạch tuần " + weekOf(dd) + " của " + R.nag + " đại lý trên tuyến hôm nay.") + " Bảng sản phẩm: Target là kế hoạch cả tháng (lít/kg) theo Sheet1 file KHDS tháng 10; Kết quả là thực hiện trong ngày, tự lấy từ tab Thực hiện (số mờ). Anh gõ đè để sửa tay, trang tự lưu; xóa trống để về số tự động.</p>";
+  h += '<p class="rp-note">Target sell-out ngày ' + (R.src === "day" ? "lấy từ kế hoạch ngày ở tab Kế hoạch." : "lấy từ kế hoạch tuần " + weekOf(dd) + " của " + R.nag + " đại lý trên tuyến hôm nay.") + " Bảng sản phẩm: Target là kế hoạch cả tháng (lít/kg) theo Sheet1 file KHDS tháng 10; Kết quả là " + (dd >= KQSP0 ? "số cộng dồn từ ngày 12/10 đến hôm nay (kết quả ngày trước + thực hiện trong ngày ở tab Thực hiện), số mờ là số tự động; ngày nào anh sửa tay thì các ngày sau cộng tiếp từ số đó." : "thực hiện trong ngày, tự lấy từ tab Thực hiện (số mờ).") + " Anh gõ đè để sửa tay, trang tự lưu; xóa trống để về số tự động.</p>";
   // Sản phẩm
   h += '<div class="scroll rp-s"><table class="rp-t rp-w rp-p"><thead><tr><th>Sản phẩm</th><th class="c">ĐVT</th><th class="num">Target</th><th class="num">Kết quả</th><th class="num">%</th><th>Nguyên nhân đạt/không</th><th>Giải pháp như thế nào</th><th>Dung tích</th><th class="num">Giá giao dịch</th></tr></thead><tbody>';
   R.prod.forEach(function (p) {
