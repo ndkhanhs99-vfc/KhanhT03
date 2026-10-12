@@ -1242,7 +1242,7 @@ var DNX = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6"
 function xdmy(s) { return s ? s.slice(8) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4) : ""; }
 function xdn(s) { return DNX[new Date(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)).getDay()]; }
 function xroute(r) { var a = D.agents.filter(function (x) { return x.m === r.m; })[0], d = a ? dayOf(a) : "";
-  return d && d === keyOfDate(r.kh) ? '<div class="xrt xin">đúng tuyến SE</div>' : '<div class="xrt xout">sai tuyến SE</div>'; }
+  return d && d === keyOfDate(r.kh) ? '<div class="xrt xin">Đúng tuyến SE</div>' : '<div class="xrt xout">Sai tuyến SE</div>'; }
 function xname(m) { var a = D.agents.filter(function (x) { return x.m === m; })[0]; return a ? a.s : ""; }
 function xcard(r) { var nm = xname(r.m);
   return '<div class="xmk"><div><div class="xnm">' + esc(nm || r.m) + '</div><div class="xcd">' + esc(r.m) + "</div>" + xroute(r) + "</div>" + (r.th ? '<span class="xst xok">TH ' + xdmy(r.th) + "</span>" : '<span class="xst xno">Chưa thực hiện</span>') +
