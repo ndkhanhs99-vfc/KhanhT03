@@ -251,6 +251,7 @@ td.bl { color: #1a1ac8; }
 .rp-w.rp-p td:first-child { min-width: 10rem; }
 .rp-w td:first-child { min-width: 6.5rem; }
 .rp-w input.ovr:not(.w) { width: 7rem; }
+.rp-w input.ovr.mny { width: 9.5rem; }
 .rp-s + .rp-s { border-top: 8px solid var(--tint); }
 .rp-t tr.grp td { background: var(--tint); font-weight: 700; color: var(--accent); }
 .rp-t td { vertical-align: middle; }
@@ -698,6 +699,18 @@ function buildRep(dd) {
     }
     cum = auto;
   }
+  // Tiến độ lũy kế tháng: từ ngày KQSP0 = lũy kế ngày trước (kể cả số sửa tay) + sell-out trong ngày (kể cả số sửa tay)
+  var lkAuto = kLk;
+  if (dd >= KQSP0) {
+    var dsell = {}, lrun = 0;
+    ACT.forEach(function (e) { var v = e.thung * priceOf(e.sp); if (e.date < KQSP0) lrun += v; else if (e.date <= dd) dsell[e.date] = (dsell[e.date] || 0) + v; });
+    var y = KQSP0;
+    while (y <= dd) {
+      var dc = rpDoc(y), sv = has(dc.kq_sell) ? numv(dc.kq_sell) : (dsell[y] || 0), la = lrun + sv;
+      if (y === dd) lkAuto = la; lrun = has(dc.kq_lk) ? numv(dc.kq_lk) : la;
+      var ny = new Date(+y.slice(0, 4), +y.slice(5, 7) - 1, +y.slice(8, 10) + 1); y = ny.getFullYear() + "-" + pad(ny.getMonth() + 1) + "-" + pad(ny.getDate());
+    }
+  }
   var ft = fileTot();
   function ov(k, auto) { return has(day[k]) ? numv(day[k]) : auto; }
   function mv(k) { return has(day[k]) ? numv(day[k]) : null; }
@@ -706,11 +719,11 @@ function buildRep(dd) {
   var c2hd = anyHd ? hd.reduce(function (s, h) { return s + (h.c2 || 0); }, 0) : null;
   var c2gd = anyHd ? hd.reduce(function (s, h) { return s + (h.gd || 0); }, 0) : null;
   var ind = [
-    { g: "1. Sell-out", l: "Giá trị Sell-out", u: "Đồng", tg: ov("tg_sell", tSell), tk: "tg_sell", ta: tSell, kq: kSell, money: 1 },
-    { g: "", l: "Tiến độ lũy kế tháng", u: "Đồng", tg: ft.kv, kq: kLk, money: 1 },
-    { g: "", l: "Số C2 lũy kế Active", u: "C2", tg: D.agents.length, kq: Object.keys(act).length },
-    { g: "2. Tuyến", l: "C2 tiếp cận theo tuyến", u: "C2", tg: ag.length, kq: ov("kq_tt", ag.length), kk: "kq_tt", ka: ag.length },
-    { g: "", l: "C2 có phát sinh giao dịch", u: "C2", tg: ag.length, kq: Object.keys(gd).length },
+    { g: "1. Sell-out", l: "Giá trị Sell-out", u: "Tỷ", tg: ov("tg_sell", tSell), tk: "tg_sell", ta: tSell, kq: ov("kq_sell", kSell), kk: "kq_sell", ka: kSell, money: 1 },
+    { g: "", l: "Tiến độ lũy kế tháng", u: "Tỷ", tg: ov("tg_lk", ft.kv), tk: "tg_lk", ta: ft.kv, kq: ov("kq_lk", lkAuto), kk: "kq_lk", ka: lkAuto, money: 1 },
+    { g: "", l: "Số C2 lũy kế Active", u: "C2", tg: ov("tg_c2act", D.agents.length), tk: "tg_c2act", ta: D.agents.length, kq: ov("kq_c2act", Object.keys(act).length), kk: "kq_c2act", ka: Object.keys(act).length },
+    { g: "2. Tuyến", l: "C2 tiếp cận theo tuyến", u: "C2", tg: ov("tg_tt", ag.length), tk: "tg_tt", ta: ag.length, kq: ov("kq_tt", ag.length), kk: "kq_tt", ka: ag.length },
+    { g: "", l: "C2 có phát sinh giao dịch", u: "C2", tg: ov("tg_gd", ag.length), tk: "tg_gd", ta: ag.length, kq: ov("kq_gd", Object.keys(gd).length), kk: "kq_gd", ka: Object.keys(gd).length },
     { g: "3. TTTM", l: "Số C2 có đầu tư hoạt động", u: "C2", tg: mv("tg_c2hd"), tk: "tg_c2hd", kq: has(day.kq_c2hd) ? numv(day.kq_c2hd) : c2hd, kk: "kq_c2hd", ka: c2hd },
     { g: "", l: "Số C2 đã phát sinh giao dịch từ HĐ", u: "C2", tg: mv("tg_c2gd"), tk: "tg_c2gd", kq: has(day.kq_c2gd) ? numv(day.kq_c2gd) : c2gd, kk: "kq_c2gd", ka: c2gd },
     { g: "", l: "Số ND đã tiếp cận", u: "ND", tg: mv("tg_nd"), tk: "tg_nd", kq: mv("kq_nd"), kk: "kq_nd" },
@@ -718,7 +731,7 @@ function buildRep(dd) {
   ];
   function prow(key, n, u, dt0, gia0) {
     var pk = "p_" + key + "_", ta = MT[key] || 0, kAuto = cum ? (cum[key] || 0) : (kP[key] || 0);
-    return { key: key, n: n, u: u, ta: ta, tg: has(day[pk + "t"]) ? numv(day[pk + "t"]) : ta, kqa: kAuto, kqo: has(day[pk + "k"]), kq: has(day[pk + "k"]) ? numv(day[pk + "k"]) : kAuto,
+    return { key: key, n: n, u: u, ta: ta, tg: has(day[pk + "t"]) ? numv(day[pk + "t"]) : (has(carry(dd, pk + "t")) ? numv(carry(dd, pk + "t")) : ta), kqa: kAuto, kqo: has(day[pk + "k"]), kq: has(day[pk + "k"]) ? numv(day[pk + "k"]) : kAuto,
       nn: day[pk + "nn"] !== undefined ? day[pk + "nn"] : carry(dd, pk + "nn"), gp: day[pk + "gp"] !== undefined ? day[pk + "gp"] : carry(dd, pk + "gp"),
       dt: cfgv("dt_" + key, dt0), gia: cfgv("gia_" + key, gia0) };
   }
@@ -742,7 +755,7 @@ function pS(kq, tg) { return kq == null || tg == null ? "" : pctS(kq, tg); }
 function inp(key, val, o) {
   o = o || {}; var sc = o.cfg ? "cfg" : "day";
   if (o.ta) return '<textarea class="ovr tx" rows="2" data-rp="' + esc(key) + '" data-sc="' + sc + '" aria-label="' + esc(o.lab || key) + '">' + esc(val) + "</textarea>";
-  return '<input type="' + (o.text ? "text" : "number") + '"' + (o.text ? "" : ' inputmode="decimal" step="any" min="0"') + ' class="ovr' + (o.text ? " w" : "") + (o.auto ? " auto" : "") + '" data-rp="' + esc(key) + '" data-sc="' + sc + '" value="' + esc(val == null ? "" : val) + '"' + (o.ph ? ' placeholder="' + esc(o.ph) + '"' : "") + ' aria-label="' + esc(o.lab || key) + '">';
+  return '<input type="' + (o.text ? "text" : "number") + '"' + (o.text ? "" : ' inputmode="decimal" step="any" min="0"') + ' class="ovr' + (o.text ? " w" : "") + (o.auto ? " auto" : "") + (o.cls ? " " + o.cls : "") + '" data-rp="' + esc(key) + '" data-sc="' + sc + '" value="' + esc(val == null ? "" : val) + '"' + (o.ph ? ' placeholder="' + esc(o.ph) + '"' : "") + ' aria-label="' + esc(o.lab || key) + '">';
 }
 function viewDaily() {
   var dd = S.dd, R = buildRep(dd); LASTREP = R;
@@ -758,8 +771,8 @@ function viewDaily() {
   // Chỉ số mục tiêu
   h += '<div class="scroll rp-s"><table class="rp-t rp-w"><thead><tr><th>Chỉ số mục tiêu</th><th>Chỉ số</th><th class="c">ĐVT</th><th class="num">Target</th><th class="num">Kết quả</th><th class="num">% đạt</th><th class="num">Chênh lệch TH − Target</th></tr></thead><tbody>';
   R.ind.forEach(function (r) {
-    var tgC = r.tk ? inp(r.tk, r.money ? Math.round(r.tg || 0) : r.tg, { lab: "Target " + r.l, ph: r.ta != null ? String(r.ta) : "" }) : fv(r, r.tg);
-    var kqC = r.kk ? inp(r.kk, r.kq, { lab: "Kết quả " + r.l }) : fv(r, r.kq);
+    var tgC = r.tk ? inp(r.tk, r.money ? Math.round(r.tg || 0) : r.tg, { lab: "Target " + r.l, ph: r.ta != null ? String(r.money ? Math.round(r.ta) : r.ta) : "", cls: r.money ? "mny" : "" }) : fv(r, r.tg);
+    var kqC = r.kk ? inp(r.kk, r.money ? Math.round(r.kq || 0) : r.kq, { lab: "Kết quả " + r.l, auto: r.ka !== undefined && !has(rpDoc(dd)[r.kk]), cls: r.money ? "mny" : "", ph: r.ka != null ? String(r.money ? Math.round(r.ka) : r.ka) : "" }) : fv(r, r.kq);
     h += "<tr>" + (r.g ? '<td class="lb2">' + r.g + "</td>" : "<td></td>") + "<td>" + r.l + '</td><td class="c">' + r.u + '</td><td class="num">' + tgC + '</td><td class="num">' + kqC + '</td><td class="num">' + pS(r.kq, r.tg) + '</td><td class="num">' + diffS(r) + "</td></tr>";
   });
   h += "</tbody></table></div>";
@@ -1461,6 +1474,11 @@ rebuildAct(); render();
         Object.keys(KQ).forEach(function (k) { var f = "p_" + k + "_k"; if (cur[f] === undefined || cur[f] === "") add[f] = KQ[k]; });
         if (Object.keys(add).length) await rr.set(add, { merge: true });
         await meta.set({ kq1012: true }, { merge: true });
+      }
+      if (!md.rp1012b) {
+        /* Báo cáo ngày 12/10 theo bản anh Khánh đã chỉnh chuẩn (ảnh gửi 17:24) */
+        await DB.collection("rp").doc("2026-10-12").set({"tg_sell": "95094532", "kq_sell": "42079136", "tg_lk": "2764290442", "kq_lk": "244845098", "tg_c2act": "32", "kq_c2act": "12", "tg_tt": "6", "kq_tt": "6", "tg_gd": "6", "kq_gd": "5", "tg_c2hd": "5", "kq_c2hd": "3", "tg_c2gd": "5", "kq_c2gd": "2", "tg_nd": "20", "kq_nd": "18", "tg_ndcd": "20", "kq_ndcd": "12", "p_amistar_t": "750", "p_amistar_k": "120", "p_amistar_nn": "Lúa còn nhỏ, xả đê nhiều", "p_amistar_gp": "Tận dụng chương trình đang có, tất niên để thúc hàng các C2 lớn", "p_pexena_t": "78", "p_pexena_k": "2", "p_pexena_nn": "Lúa mới hơn 20 ngày, chưa có dịch hại nên nông dân chưa có nhu cầu", "p_pexena_gp": "Tận dụng chương trình đang có, tất niên để thúc hàng các C2 lớn", "p_incipio_k": "12", "p_incipio_nn": "", "p_incipio_gp": "", "p_blastogan_t": "435", "p_blastogan_k": "15", "p_blastogan_nn": "Lúa 20 ngày nông dân chưa đầu tư hàng hiệu", "p_blastogan_gp": "Tận dụng chương trình đang có, tất niên để thúc hàng các C2 lớn", "p_anvil_t": "732", "p_anvil_k": "276", "p_anvil_nn": "Đang tận dụng các chương trình tháng, quý, tất niên", "p_anvil_gp": "Sẽ đạt trong tháng này", "p_ridomil_t": "370", "p_ridomil_k": "40", "p_ridomil_nn": "Lúa còn nhỏ, xả đê nhiều", "p_ridomil_gp": "Tận dụng chương trình đang có, tất niên để thúc hàng các C2 lớn", "p_michelle_k": "0", "p_michelle_nn": "", "p_michelle_gp": "", "p_xantocin_t": "10", "p_xantocin_k": "0", "p_xantocin_nn": "Lúa còn nhỏ, xả đê nhiều", "p_xantocin_gp": "Kết hợp MDO giới thiệu giải pháp, tăng nhận diện đến nông dân", "p_tora_t": "8", "p_tora_k": "0", "p_tora_nn": "Lúa còn nhỏ, xả đê nhiều", "p_tora_gp": "Kết hợp MDO giới thiệu giải pháp, tăng nhận diện đến nông dân", "p_delfan_t": "10", "p_delfan_k": "0", "p_delfan_nn": "Lúa còn nhỏ, xả đê nhiều", "p_delfan_gp": "Kết hợp MDO giới thiệu giải pháp, tăng nhận diện đến nông dân"}, { merge: true });
+        await meta.set({ rp1012b: true }, { merge: true });
       }
     } catch (e) {}
   })();
