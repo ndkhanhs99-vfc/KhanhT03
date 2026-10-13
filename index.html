@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta http-equiv="Cache-Control" content="no-cache"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Sổ doanh số SE</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
 <style>
@@ -330,6 +330,8 @@ table.xmt{width:100%;border-collapse:collapse;background:var(--surface);font-siz
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+<script>/* Tự cập nhật: nếu trên mạng đã có bản mới hơn bản đang mở (bộ nhớ đệm của điện thoại) thì tải lại 1 lần */
+(function () { var V = "6452947155"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
 <script src="config.js"></script>
 <script>
 window.__startApp = function () {
