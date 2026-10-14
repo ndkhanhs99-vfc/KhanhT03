@@ -64,5 +64,20 @@
         await Promise.all(ops3);
         await meta.set({ kh3: true }, { merge: true });
       }
+      if (!md.kh4) {
+        /* Kế hoạch tháng 10 theo file chuẩn "Ngày ghé 1 tháng 10" (sheet KH chi tiết) anh Khánh gửi 14/10: thay toàn bộ dòng tự động bằng đúng file.
+           Dòng anh tự thêm (khác mọi bản tự động trước) được giữ, trừ khi trùng đại lí–sản phẩm–ngày với file thì lấy theo file. */
+        var all4 = await DB.collection("kh").get(), ops4 = [], have4 = {};
+        function wk4(ds) { var d = +ds.slice(8, 10); return d <= 11 ? 1 : d <= 18 ? 2 : d <= 25 ? 3 : 4; }
+        all4.docs.forEach(function (d) {
+          var x = d.data(); if (!x || !x.date) return; have4[d.id] = x;
+          var o1 = KH_OLD[d.id], o2 = KH_PREV[d.id], auto = (o1 && +o1.thung === +x.thung) || (o2 && +o2.thung === +x.thung);
+          if (!auto && x.date >= MONTH + "-12") { var l = (PL[x.khbl] || []).filter(function (z) { return z[1] === x.sp; })[0]; if (l && +l[4 + wk4(x.date)] === +x.thung) auto = true; }
+          if (auto && !KH_SEED[d.id]) ops4.push(DB.collection("kh").doc(d.id).delete());
+        });
+        Object.keys(KH_SEED).forEach(function (id) { var x = have4[id]; if (!x || +x.thung !== +KH_SEED[id].thung || x.date !== KH_SEED[id].date) ops4.push(DB.collection("kh").doc(id).set(KH_SEED[id])); });
+        await Promise.all(ops4);
+        await meta.set({ kh4: true }, { merge: true });
+      }
     } catch (e) {}
   })();
