@@ -335,7 +335,7 @@ table.xmt{width:100%;border-collapse:collapse;background:var(--surface);font-siz
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>/* Tự cập nhật: nếu trên mạng đã có bản mới hơn bản đang mở (bộ nhớ đệm của điện thoại) thì tải lại 1 lần */
-(function () { var V = "bacb26c738"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
+(function () { var V = "2bed9d95e6"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
 <script src="config.js"></script>
 <script>
 window.__startApp = function () {
@@ -1250,6 +1250,8 @@ var MKS = { sel: null, f: "all" };
 function xwk(ds) { var d = +ds.slice(8, 10); return d <= 4 ? "Tuần 1" : d <= 11 ? "Tuần 2" : d <= 18 ? "Tuần 3" : d <= 25 ? "Tuần 4" : "Tuần 5"; }
 var XWR = { "Tuần 1": "01–04/10", "Tuần 2": "05–11/10", "Tuần 3": "12–18/10", "Tuần 4": "19–25/10", "Tuần 5": "26–31/10" };
 MKT.forEach(function (r) { r.tuan = xwk(r.kh); });
+/* Mở tab MKT: chọn sẵn ngày hôm nay (nếu đang trong tháng 10/2026) */
+function xToday() { var t = new Date(), ds = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()); if (ds.slice(0, 7) === "2026-10") { MKS.sel = ds; MKS.f = xwk(ds); } else { MKS.sel = null; MKS.f = "all"; } }
 (function () { var seen = {}; MKT.forEach(function (r) { var k = (r.kh + "_" + r.m + "_" + r.hd).replace(/[^A-Za-z0-9_-]/g, ""); seen[k] = (seen[k] || 0) + 1; r.id = k + "_" + seen[k]; }); })();
 /* Số nông dân tham dự / đăng ký PMH: lấy từ file, anh sửa trên web thì lưu ở kho "mk" (Firebase) */
 function xnv(r, f) { var o = (S.mk || {})[r.id]; if (o && o[f] !== undefined && o[f] !== "") return +o[f]; return r[f] == null ? null : +r[f]; }
@@ -1308,6 +1310,7 @@ document.getElementById("view").addEventListener("change", function (ev) {
   if (DB) DB.collection("mk").doc(id).set(o).catch(function () { toast("Chưa lưu được lên đám mây"); });
   clearTimeout(S.mkT); S.mkT = setTimeout(softRender, 400);
 });
+xToday();
 var TABS = [["kh", "Kế hoạch"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"], ["map", "Vị trí C2"], ["mkt", "MKT của tôi"]];
 if (!TABS.some(function (x) { return x[0] === S.tab; })) S.tab = "kh";
 function viewKH() { return viewEntry("kh"); }
@@ -1364,7 +1367,7 @@ document.getElementById("sub").textContent = SE_NAME + " · SE Tân Châu · " +
 var view = document.getElementById("view");
 document.getElementById("tabs").addEventListener("click", function (ev) {
   var b = ev.target.closest("[data-act=tab]"); if (!b) return;
-  clearTimeout(S.at); S.tab = b.getAttribute("data-v"); S.edit = null; try { localStorage.setItem("sdsse_tab", S.tab); } catch (x) {}
+  clearTimeout(S.at); S.tab = b.getAttribute("data-v"); S.edit = null; if (S.tab === "mkt") xToday(); try { localStorage.setItem("sdsse_tab", S.tab); } catch (x) {}
   render(); window.scrollTo(0, 0);
 });
 view.addEventListener("click", function (ev) {
