@@ -181,6 +181,8 @@ td.bl { color: #1a1ac8; }
 .ovb { background: var(--surface); border-radius: 8px; padding: 12px; max-width: 100%; max-height: 100%; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
 .ovb img { max-width: 100%; height: auto; border: 1px solid var(--line); }
 .ovb p { margin: 0; font-size: 13px; color: var(--muted); }
+.rfw { margin: 2px 0 0; padding: 0 4px; }
+.rfb { appearance: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; color: var(--accent); background: var(--surface); border: 1px solid var(--accent); border-radius: 6px; padding: 5px 12px; }
 .bk { display: flex; align-items: center; gap: 6px; margin-top: -10px; padding: 0 4px; font-size: 12.5px; color: var(--muted); }
 .bk .bkl { width: 18px; height: 18px; flex: none; stroke: var(--accent); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 560px) {
@@ -335,7 +337,7 @@ table.xmt{width:100%;border-collapse:collapse;background:var(--surface);font-siz
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>/* Tự cập nhật: nếu trên mạng đã có bản mới hơn bản đang mở (bộ nhớ đệm của điện thoại) thì tải lại 1 lần */
-(function () { var V = "2bed9d95e6"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
+(function () { var V = "a95457b912"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
 <script src="config.js"></script>
 <script>
 window.__startApp = function () {
@@ -371,7 +373,8 @@ function dayLabel(ds) { var k = keyOfDate(ds); return k ? DAYNAME[k] : "Chủ nh
 function newE(d) { return { date: d, khbl: "", kq: "", sp: "", pq: "", thung: "" }; }
 var T0 = todayStr();
 var S = { tab: "kh", khview: "nhap", kmode: "agent", unit: "thung", q: "", open: {}, kh: {}, th: {}, route: {}, scope: "all", psrc: "file", dd: T0, dp: false, e: { kh: newE(T0), th: newE(T0) }, edit: null, delId: "", dbOk: null, defer: false, ld: "", confReset: false };
-S.tab = "kh"; /* luôn mở ở tab Kế hoạch */
+S.tab = "kh"; /* luôn mở ở tab Kế hoạch; riêng khi bấm "Làm mới" thì quay lại đúng tab và ngày đang xem */
+try { var rt = sessionStorage.getItem("sdsse_rtab"), rd = sessionStorage.getItem("sdsse_rdd"); if (rt) { S.tab = rt; if (rd && rd.slice(0, 7) === MONTH) { S.dd = rd; S.e.kh.date = rd; S.e.th.date = rd; } } sessionStorage.removeItem("sdsse_rtab"); sessionStorage.removeItem("sdsse_rdd"); } catch (e) {}
 var DB = null, ACT = [], ACTK = [], LASTREP = null;
 try { S.lastSave = +localStorage.getItem("sdsse_last") || 0; } catch (e) { S.lastSave = 0; }
 function lsGet(n) { try { var v = localStorage.getItem("sdsse_" + n); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
@@ -540,6 +543,7 @@ function dateCard(dd, td) {
   if (S.dp) h += '<div class="dpick"><button class="ib wide" data-act="dstep" data-v="-1" aria-label="Ngày trước">‹ Trước</button><input type="date" id="dd" min="' + MONTH + '-01" max="' + MONTH + "-" + pad(LAST) + '" value="' + esc(dd) + '" aria-label="Chọn ngày hiển thị"><button class="ib wide" data-act="dstep" data-v="1" aria-label="Ngày sau">Sau ›</button><button class="ib wide" data-act="dtoday">Hôm nay</button></div>';
   h += "</div>";
   h += '<div class="bk" role="status">' + bkHtml() + "</div>";
+  if (S.tab === "bc") h += '<div class="rfw"><button class="rfb" type="button" data-act="refresh">↻ Làm mới</button></div>';
   return h;
 }
 function viewEntry(k) {
@@ -1386,6 +1390,12 @@ view.addEventListener("click", function (ev) {
   else if (act === "dp") { S.dp = !S.dp; render(); }
   else if (act === "dstep") { var d0 = new Date(+S.dd.slice(0, 4), +S.dd.slice(5, 7) - 1, +S.dd.slice(8, 10) + (+t.getAttribute("data-v"))); setDD(d0.getFullYear() + "-" + pad(d0.getMonth() + 1) + "-" + pad(d0.getDate())); }
   else if (act === "dtoday") { setDD(todayStr()); }
+  else if (act === "refresh") {
+    var fe = document.activeElement; if (fe && fe.hasAttribute && fe.hasAttribute("data-rp")) { clearTimeout(fe._rt); if (fe._saved !== fe.value) rpSet(fe.getAttribute("data-sc"), fe.getAttribute("data-rp"), fe.value); }
+    try { sessionStorage.setItem("sdsse_rtab", S.tab); sessionStorage.setItem("sdsse_rdd", S.dd); } catch (x) {}
+    t.disabled = true; t.textContent = "Đang làm mới…";
+    setTimeout(function () { location.replace(location.pathname + "?r=" + Date.now()); }, 300);
+  }
   else if (act === "rc") { var m = t.getAttribute("data-v"); S.e[k].khbl = m; S.e[k].kq = m; render(); focusEl("in-sp"); }
   else if (act === "add") { addEntry(k); }
   else if (act === "edit") { var id = t.getAttribute("data-id"), r = S[k][id]; if (r) { S.edit = { k: k, id: id, sp: r.sp, thung: String(r.thung) }; S.delId = ""; render(); focusEl("et"); } }
