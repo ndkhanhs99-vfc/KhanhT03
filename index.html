@@ -253,6 +253,7 @@ td.bl { color: #1a1ac8; }
 .rp-w.rp-p td:first-child { min-width: 10rem; }
 .rp-w td:first-child { min-width: 6.5rem; }
 .rp-w input.ovr:not(.w) { width: 7rem; }
+.tsn { font-size: 10.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; font-weight: 400; }
 .rp-w input.ovr.mny { width: 9.5rem; }
 .rp-s + .rp-s { border-top: 8px solid var(--tint); }
 .rp-t tr.grp td { background: var(--tint); font-weight: 700; color: var(--accent); }
@@ -337,7 +338,7 @@ table.xmt{width:100%;border-collapse:collapse;background:var(--surface);font-siz
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>/* Tự cập nhật: nếu trên mạng đã có bản mới hơn bản đang mở (bộ nhớ đệm của điện thoại) thì tải lại 1 lần */
-(function () { var V = "a95457b912"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
+(function () { var V = "e8dd007ad5"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
 <script src="config.js"></script>
 <script>
 window.__startApp = function () {
@@ -785,6 +786,7 @@ function viewDaily() {
   R.ind.forEach(function (r) {
     var tgC = r.tk ? inp(r.tk, r.money ? Math.round(r.tg || 0) : r.tg, { lab: "Target " + r.l, ph: r.ta != null ? String(r.money ? Math.round(r.ta) : r.ta) : "", cls: r.money ? "mny" : "" }) : fv(r, r.tg);
     var kqC = r.kk ? inp(r.kk, r.money ? Math.round(r.kq || 0) : r.kq, { lab: "Kết quả " + r.l, auto: r.ka !== undefined && !has(rpDoc(dd)[r.kk]), cls: r.money ? "mny" : "", ph: r.ka != null ? String(r.money ? Math.round(r.ka) : r.ka) : "" }) : fv(r, r.kq);
+    if (r.tk && TTK.test(r.tk)) tgC += tsNote(r.tk); if (r.kk && TTK.test(r.kk)) kqC += tsNote(r.kk);
     h += "<tr>" + (r.g ? '<td class="lb2">' + r.g + "</td>" : "<td></td>") + "<td>" + r.l + '</td><td class="c">' + r.u + '</td><td class="num">' + tgC + '</td><td class="num">' + kqC + '</td><td class="num">' + pS(r.kq, r.tg) + '</td><td class="num">' + diffS(r) + "</td></tr>";
   });
   h += "</tbody></table></div>";
@@ -807,10 +809,16 @@ function viewDaily() {
   return h;
 }
 function viewReport() { return viewDaily(); }
+/* 4 dòng TTTM nhập tay: ghi thời điểm nhập (ngày giờ phút giây) dưới ô */
+var TTK = /^(tg|kq)_(c2hd|c2gd|nd|ndcd)$/;
+function tsNote(key) { var t = rpDoc(S.dd)["ts_" + key]; if (!t || !has(rpDoc(S.dd)[key])) return ""; var d = new Date(+t);
+  return '<div class="tsn">Nhập ' + pad(d.getDate()) + "/" + pad(d.getMonth() + 1) + "/" + d.getFullYear() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + "</div>"; }
 function rpSet(sc, key, raw, forId) {
   var id = sc === "cfg" ? "cfg" : (forId || S.dd), doc = Object.assign({}, rpDoc(id)), v = String(raw);
   var isText = /_(nn|gp)$/.test(key) || /^(terr|tsm|mdo|dt_)/.test(key);
   if (isText) doc[key] = v; else if (v.trim() === "") delete doc[key]; else doc[key] = v.trim();
+  if (TTK.test(key)) { if (has(doc[key])) doc["ts_" + key] = Date.now(); else delete doc["ts_" + key]; }
+  if (TTK.test(key)) setTimeout(function () { var inp = document.querySelector('input[data-rp="' + key + '"]'); if (!inp) return; var td = inp.parentNode, old = td.querySelector(".tsn"); if (old) old.remove(); td.insertAdjacentHTML("beforeend", tsNote(key)); }, 0);
   S.rp[id] = doc; lsSet("rp", S.rp); markSaved(); toast("Đã lưu");
   if (DB) DB.collection("rp").doc(id).set(doc).catch(function () { toast("Chưa lưu được lên đám mây"); });
   clearTimeout(S.rpT); S.rpT = setTimeout(softRender, 350);
