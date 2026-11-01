@@ -79,5 +79,23 @@
         await Promise.all(ops4);
         await meta.set({ kh4: true }, { merge: true });
       }
+      if (!md.kh11) {
+        /* Kế hoạch tháng 11 theo file KHDS T11 (đã chia 4 tuần: 1-7, 8-14, 15-21, 22-30): mỗi tuần đặt vào ngày đi tuyến đầu tiên của đại lí trong tuần đó
+           (tuyến lấy cả phần anh đã đổi trên web). Chỉ thêm dòng còn thiếu, không ghi đè dòng đã có. */
+        var rs11 = await DB.collection("route").get(), RT11 = {}; rs11.docs.forEach(function (d) { var x = d.data(); if (x && x.day) RT11[d.id] = x.day; });
+        var W11 = [[1, 7], [8, 14], [15, 21], [22, 30]], P11 = {}, want11 = {}, t11 = Date.now();
+        DM["2026-11"].plan.forEach(function (l) { (P11[l[0]] = P11[l[0]] || []).push(l); });
+        D.agents.forEach(function (a) {
+          var rd = RT11[a.m] ? (RT11[a.m] === "none" ? "" : RT11[a.m]) : (a.d || ""); if (!rd) return;
+          W11.forEach(function (rg, wi) {
+            var dt = ""; for (var d = rg[0]; d <= rg[1]; d++) { var ds = "2026-11-" + pad(d); if (keyOfDate(ds) === rd) { dt = ds; break; } }
+            if (!dt) return;
+            (P11[a.m] || []).forEach(function (l) { var q = l[5 + wi]; if (q > 0) want11[docId(dt, a.m, l[1])] = { date: dt, khbl: a.m, sp: l[1], thung: q, ts: t11++ }; });
+          });
+        });
+        var have11 = {}; (await DB.collection("kh").get()).docs.forEach(function (d) { have11[d.id] = 1; });
+        await Promise.all(Object.keys(want11).filter(function (id) { return !have11[id]; }).map(function (id) { return DB.collection("kh").doc(id).set(want11[id]); }));
+        await meta.set({ kh11: true }, { merge: true });
+      }
     } catch (e) {}
   })();
