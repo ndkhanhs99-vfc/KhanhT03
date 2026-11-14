@@ -62,6 +62,8 @@ input[type=text], input[type=date], input[type=number], select { font: inherit; 
 .grow { flex: 1 1 200px; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; min-width: 0; }
 .panel.flush { padding: 0; overflow: hidden; }
+.tile.kwnow { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.tile.kwtot { background: var(--tint); }
 .panel h2, h2.sec { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin: 0 0 10px; }
 .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 .panel.flush .scroll { border: 0; border-radius: 0; }
@@ -342,7 +344,7 @@ table.xmt{width:100%;border-collapse:collapse;background:var(--surface);font-siz
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>/* Tự cập nhật: nếu trên mạng đã có bản mới hơn bản đang mở (bộ nhớ đệm của điện thoại) thì tải lại 1 lần */
-(function () { var V = "0bc04891a0"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
+(function () { var V = "714252f8c4"; try { fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) { t = (t || "").trim(); if (t && t !== V) { var k = "sdsse_upd_" + t; if (!sessionStorage.getItem(k)) { sessionStorage.setItem(k, "1"); location.reload(); } } }).catch(function () {}); } catch (e) {} })();</script>
 <script src="config.js"></script>
 <script>
 window.__startApp = function () {
@@ -1335,7 +1337,30 @@ document.getElementById("view").addEventListener("change", function (ev) {
   clearTimeout(S.mkT); S.mkT = setTimeout(softRender, 400);
 });
 xToday();
-var TABS = [["kh", "Kế hoạch"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"], ["map", "Vị trí C2"], ["mkt", "MKT của tôi"]];
+/* ---------- KH Tuần: tổng kế hoạch từng tuần theo file KHDS ---------- */
+function viewKHW() {
+  var W = WK.map(function () { return { t: 0, v: 0, l: 0, ag: {} }; }), tot = { t: 0, v: 0, l: 0, ag: {} }, bySp = {};
+  D.plan.forEach(function (l) {
+    var p = P[l[1]] || {}, g = p.gr || l[2], vol = +l[3] || 0;
+    var r = bySp[g] = bySp[g] || { w: [0, 0, 0, 0], v: [0, 0, 0, 0] };
+    for (var i = 0; i < 4; i++) { var q = +l[5 + i] || 0; if (!q) continue;
+      W[i].t += q; W[i].v += q * l[4]; W[i].l += q * vol; W[i].ag[l[0]] = 1; r.w[i] += q; r.v[i] += q * l[4];
+      tot.t += q; tot.v += q * l[4]; tot.l += q * vol; tot.ag[l[0]] = 1; }
+  });
+  var cw = weekOf(todayStr()) - 1;
+  var h = '<section class="panel" style="margin-top:14px"><h2>Tổng kế hoạch theo tuần · tháng ' + M + "/" + Y + '</h2><p class="meta" style="margin:-4px 0 12px">Theo file KHDS tháng ' + M + ". Tuần " + WK.map(function (r, i) { return (i + 1) + ": " + r[0] + "–" + r[1]; }).join(", ") + ".</p>";
+  h += '<div class="tiles">' + W.map(function (w, i) {
+    return '<div class="tile' + (i === cw ? " kwnow" : "") + '"><p class="k">Tuần ' + (i + 1) + " · " + WK[i][0] + "–" + WK[i][1] + "/" + M + (i === cw ? " · tuần này" : "") + '</p><p class="v">' + nf0.format(w.t) + ' thùng</p><p class="s">' + nf0.format(w.v) + " đ<br>" + Object.keys(w.ag).length + " đại lý · " + (tot.v ? Math.round(w.v / tot.v * 100) : 0) + "% tháng</p></div>";
+  }).join("") + '<div class="tile kwtot"><p class="k">Cả tháng</p><p class="v">' + nf0.format(tot.t) + ' thùng</p><p class="s">' + nf0.format(tot.v) + " đ<br>" + Object.keys(tot.ag).length + " đại lý</p></div></div>";
+  var gs = Object.keys(bySp).sort(function (a, b) { var x = bySp[a].v.reduce(function (s, n) { return s + n; }, 0), y = bySp[b].v.reduce(function (s, n) { return s + n; }, 0); return y - x; });
+  h += '<h2 style="margin-top:18px">Theo sản phẩm (số thùng)</h2><div class="scroll"><table><thead><tr><th>Sản phẩm</th>' + WK.map(function (r, i) { return '<th class="num">T' + (i + 1) + "<br>" + r[0] + "–" + r[1] + "</th>"; }).join("") + '<th class="num">Tổng thùng</th><th class="num">Doanh số (đ)</th></tr></thead><tbody>' +
+    gs.map(function (g) { var r = bySp[g], t = r.w.reduce(function (s, n) { return s + n; }, 0), v = r.v.reduce(function (s, n) { return s + n; }, 0);
+      return "<tr><td>" + esc(g) + "</td>" + r.w.map(function (n) { return cell(n); }).join("") + '<td class="num"><b>' + fmt(t) + '</b></td><td class="num">' + nf0.format(v) + "</td></tr>"; }).join("") +
+    '</tbody><tfoot><tr><td><b>Tổng</b></td>' + W.map(function (w) { return '<td class="num"><b>' + fmt(w.t) + "</b></td>"; }).join("") + '<td class="num"><b>' + fmt(tot.t) + '</b></td><td class="num"><b>' + nf0.format(tot.v) + "</b></td></tr>" +
+    '<tr><td>Doanh số (đ)</td>' + W.map(function (w) { return '<td class="num">' + nf0.format(w.v) + "</td>"; }).join("") + '<td></td><td></td></tr></tfoot></table></div></section>';
+  return h;
+}
+var TABS = [["kh", "Kế hoạch"], ["khw", "KH Tuần"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"], ["map", "Vị trí C2"], ["mkt", "MKT của tôi"]];
 if (!TABS.some(function (x) { return x[0] === S.tab; })) S.tab = "kh";
 function viewKH() { return viewEntry("kh"); }
 function render() {
@@ -1343,7 +1368,7 @@ function render() {
   document.getElementById("ttl").textContent = S.tab === "bc" ? "Mục tiêu & kết quả ngày" : "Báo cáo ngày";
   document.getElementById("tabs").innerHTML = TABS.map(function (t) { return '<button class="tab" role="tab" data-act="tab" data-v="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + t[1] + "</button>"; }).join("");
   if (S.tab === "map") { v.innerHTML = ""; showMap(true); return; } showMap(false);
-  var body = S.tab === "th" ? viewEntry("th") : S.tab === "bc" ? viewReport() : S.tab === "mkt" ? viewMKT() : viewKH();
+  var body = S.tab === "th" ? viewEntry("th") : S.tab === "bc" ? viewReport() : S.tab === "mkt" ? viewMKT() : S.tab === "khw" ? viewKHW() : viewKH();
   var note = S.dbOk === false ? '<div class="banner">Chưa nối được Firebase nên số đang lưu tạm trên máy này. Kiểm tra đã bật Firestore Database và còn trong thời hạn test mode chưa.</div>' : "";
   v.innerHTML = note + body;
   if (S.restoreQ) { var q = document.getElementById("kq"); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } S.restoreQ = false; }
