@@ -1352,7 +1352,7 @@ function viewKHW() {
     '<tr><td>Doanh số (đ)</td>' + W.map(function (w) { return '<td class="num">' + nf0.format(w.v) + "</td>"; }).join("") + '<td></td><td></td></tr></tfoot></table></div></section>';
   return h;
 }
-var TABS = [["kh", "Kế hoạch"], ["khw", "KH Tuần"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"], ["map", "Vị trí C2"], ["mkt", "MKT của tôi"]];
+var TABS = [["kh", "Kế hoạch"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"], ["map", "Vị trí C2"], ["mkt", "MKT của tôi"], ["khw", "KH Tuần"]];
 if (!TABS.some(function (x) { return x[0] === S.tab; })) S.tab = "kh";
 function viewKH() { return viewEntry("kh"); }
 function render() {
