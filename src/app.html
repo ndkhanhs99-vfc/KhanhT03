@@ -64,6 +64,8 @@ input[type=text], input[type=date], input[type=number], select { font: inherit; 
 .panel.flush { padding: 0; overflow: hidden; }
 .tile.kwnow { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .tile.kwtot { background: var(--tint); }
+.kwth { margin: 8px 0 0; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 13px; }
+tr.kwtr td { background: var(--tint); }
 .panel h2, h2.sec { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin: 0 0 10px; }
 .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 .panel.flush .scroll { border: 0; border-radius: 0; }
@@ -1339,17 +1341,25 @@ function viewKHW() {
       W[i].t += q; W[i].v += q * l[4]; W[i].l += q * vol; W[i].ag[l[0]] = 1; r.w[i] += q; r.v[i] += q * l[4];
       tot.t += q; tot.v += q * l[4]; tot.l += q * vol; tot.ag[l[0]] = 1; }
   });
+  /* Thực hiện theo tuần: cộng từ tab Thực hiện (tháng đang xem) */
+  var TW = WK.map(function () { return { t: 0, v: 0 }; }), ttot = { t: 0, v: 0 };
+  ACT.forEach(function (e) { var i = e.w - 1; if (i < 0 || i > 3) return; var v = e.thung * priceOf(e.sp); TW[i].t += e.thung; TW[i].v += v; ttot.t += e.thung; ttot.v += v; });
+  function thLine(th, kh) { var pc = kh.v > 0 ? Math.round(th.v / kh.v * 100) : null; return '<p class="kwth">TH: <b>' + nf0.format(th.v) + " đ</b> · " + fmt(th.t) + " thùng" + (pc != null ? ' · <b class="' + (pc >= 100 ? "good" : "bad") + '">' + pc + "%</b>" : "") + "</p>"; }
   var cw = weekOf(todayStr()) - 1;
   var h = '<section class="panel" style="margin-top:14px"><h2>Tổng kế hoạch theo tuần · tháng ' + M + "/" + Y + '</h2><p class="meta" style="margin:-4px 0 12px">Theo file KHDS tháng ' + M + ". Tuần " + WK.map(function (r, i) { return (i + 1) + ": " + r[0] + "–" + r[1]; }).join(", ") + ".</p>";
   h += '<div class="tiles">' + W.map(function (w, i) {
-    return '<div class="tile' + (i === cw ? " kwnow" : "") + '"><p class="k">Tuần ' + (i + 1) + " · " + WK[i][0] + "–" + WK[i][1] + "/" + M + (i === cw ? " · tuần này" : "") + '</p><p class="v">' + nf0.format(w.t) + ' thùng</p><p class="s">' + nf0.format(w.v) + " đ<br>" + Object.keys(w.ag).length + " đại lý · " + (tot.v ? Math.round(w.v / tot.v * 100) : 0) + "% tháng</p></div>";
-  }).join("") + '<div class="tile kwtot"><p class="k">Cả tháng</p><p class="v">' + nf0.format(tot.t) + ' thùng</p><p class="s">' + nf0.format(tot.v) + " đ<br>" + Object.keys(tot.ag).length + " đại lý</p></div></div>";
+    return '<div class="tile' + (i === cw ? " kwnow" : "") + '"><p class="k">Tuần ' + (i + 1) + " · " + WK[i][0] + "–" + WK[i][1] + "/" + M + (i === cw ? " · tuần này" : "") + '</p><p class="v">' + nf0.format(w.t) + ' thùng</p><p class="s">' + nf0.format(w.v) + " đ<br>" + Object.keys(w.ag).length + " đại lý · " + (tot.v ? Math.round(w.v / tot.v * 100) : 0) + "% tháng</p>" + thLine(TW[i], w) + "</div>";
+  }).join("") + '<div class="tile kwtot"><p class="k">Cả tháng</p><p class="v">' + nf0.format(tot.t) + ' thùng</p><p class="s">' + nf0.format(tot.v) + " đ<br>" + Object.keys(tot.ag).length + " đại lý</p>" + thLine(ttot, tot) + "</div></div>";
   var gs = Object.keys(bySp).sort(function (a, b) { var x = bySp[a].v.reduce(function (s, n) { return s + n; }, 0), y = bySp[b].v.reduce(function (s, n) { return s + n; }, 0); return y - x; });
   h += '<h2 style="margin-top:18px">Theo sản phẩm (số thùng)</h2><div class="scroll"><table><thead><tr><th>Sản phẩm</th>' + WK.map(function (r, i) { return '<th class="num">T' + (i + 1) + "<br>" + r[0] + "–" + r[1] + "</th>"; }).join("") + '<th class="num">Tổng thùng</th><th class="num">Doanh số (đ)</th></tr></thead><tbody>' +
     gs.map(function (g) { var r = bySp[g], t = r.w.reduce(function (s, n) { return s + n; }, 0), v = r.v.reduce(function (s, n) { return s + n; }, 0);
       return "<tr><td>" + esc(g) + "</td>" + r.w.map(function (n) { return cell(n); }).join("") + '<td class="num"><b>' + fmt(t) + '</b></td><td class="num">' + nf0.format(v) + "</td></tr>"; }).join("") +
     '</tbody><tfoot><tr><td><b>Tổng</b></td>' + W.map(function (w) { return '<td class="num"><b>' + fmt(w.t) + "</b></td>"; }).join("") + '<td class="num"><b>' + fmt(tot.t) + '</b></td><td class="num"><b>' + nf0.format(tot.v) + "</b></td></tr>" +
-    '<tr><td>Doanh số (đ)</td>' + W.map(function (w) { return '<td class="num">' + nf0.format(w.v) + "</td>"; }).join("") + '<td></td><td></td></tr></tfoot></table></div></section>';
+    '<tr><td>Doanh số KH (đ)</td>' + W.map(function (w) { return '<td class="num">' + nf0.format(w.v) + "</td>"; }).join("") + '<td></td><td class="num">' + nf0.format(tot.v) + "</td></tr>" +
+    '<tr class="kwtr"><td>Doanh số TH (đ)</td>' + TW.map(function (w) { return '<td class="num">' + nf0.format(w.v) + "</td>"; }).join("") + '<td></td><td class="num">' + nf0.format(ttot.v) + "</td></tr>" +
+    '<tr class="kwtr"><td>TH số thùng</td>' + TW.map(function (w) { return '<td class="num">' + fmt(w.t) + "</td>"; }).join("") + '<td class="num">' + fmt(ttot.t) + "</td><td></td></tr>" +
+    '<tr class="kwtr"><td>% đạt (doanh số)</td>' + TW.map(function (w, i) { return '<td class="num">' + (W[i].v > 0 ? Math.round(w.v / W[i].v * 100) + "%" : "–") + "</td>"; }).join("") + '<td></td><td class="num">' + (tot.v > 0 ? Math.round(ttot.v / tot.v * 100) + "%" : "–") + "</td></tr></tfoot></table></div>" +
+    '<p class="meta" style="margin-top:8px">TH lấy từ tab Thực hiện: số thùng × đơn giá thùng, cộng theo ngày nhập trong tuần.</p></section>';
   return h;
 }
 var TABS = [["kh", "Kế hoạch"], ["th", "Thực hiện"], ["bc", "Báo cáo Ngày"], ["map", "Vị trí C2"], ["mkt", "MKT của tôi"], ["khw", "KH Tuần"]];
