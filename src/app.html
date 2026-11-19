@@ -997,7 +997,11 @@ function buildXlsx(R, modelOnly) {
   ];
   return zipStore(files);
 }
+/* Lời nhắn đi kèm khi gửi báo cáo: chia sẻ (điện thoại) thì gắn kèm, đồng thời chép sẵn vào bộ nhớ tạm để dán */
+var SEND_MSG = "Em gửi file báo cáo ngày";
+function copyMsg() { try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(SEND_MSG).catch(function () {}); } catch (e) {} }
 async function exportXlsx() {
+  copyMsg();
   var fe = document.activeElement; if (fe && fe.hasAttribute && fe.hasAttribute("data-rp")) { clearTimeout(fe._rt); if (fe._saved !== fe.value) { fe._saved = fe.value; rpSet(fe.getAttribute("data-sc"), fe.getAttribute("data-rp"), fe.value); } }
   LASTREP = buildRep(S.dd);
   var XLSX_NAME = xlsxName(LASTREP.dd);
@@ -1009,9 +1013,9 @@ async function exportXlsx() {
   }
   try {
     var f = new File([blob], XLSX_NAME, { type: blob.type });
-    if (!window.claude && navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày" }); return; }
+    if (!window.claude && navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày", text: SEND_MSG }); return; }
   } catch (e) { if (e && e.name === "AbortError") return; }
-  try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = XLSX_NAME; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải file Excel về máy"); } catch (e) { toast("Chưa tải được file Excel"); }
+  try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = XLSX_NAME; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải file Excel · đã chép sẵn: " + SEND_MSG); } catch (e) { toast("Chưa tải được file Excel"); }
 }
 
 function showImg(src) {
@@ -1097,6 +1101,7 @@ function drawXl(R) {
 }
 function imgName(dd) { return "Khánh_Báo cáo ngày_" + dd.slice(8, 10) + "." + dd.slice(5, 7) + "." + dd.slice(0, 4) + ".png"; }
 async function exportImg() {
+  copyMsg();
   var fe = document.activeElement; if (fe && fe.hasAttribute && fe.hasAttribute("data-rp")) { clearTimeout(fe._rt); if (fe._saved !== fe.value) { fe._saved = fe.value; rpSet(fe.getAttribute("data-sc"), fe.getAttribute("data-rp"), fe.value); } }
   LASTREP = buildRep(S.dd);
   var cv; try { cv = drawXl(LASTREP); } catch (e) { toast("Chưa tạo được ảnh"); return; }
@@ -1111,9 +1116,9 @@ async function exportImg() {
   if (!window.claude) {
     try {
       var f = new File([blob], fn, { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày" }); return; }
+      if (navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [f], title: "Báo cáo ngày", text: SEND_MSG }); return; }
     } catch (e) { if (e && e.name === "AbortError") return; }
-    try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải ảnh về máy"); return; } catch (e) {}
+    try { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fn; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải ảnh · đã chép sẵn: " + SEND_MSG); return; } catch (e) {}
   }
   showImg(cv.toDataURL("image/png"));
 }
